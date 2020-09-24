@@ -1,5 +1,4 @@
 <?php
-dd('ssssssssssssssssss');
 
 /**
  * Laravel - A PHP Framework For Web Artisans
