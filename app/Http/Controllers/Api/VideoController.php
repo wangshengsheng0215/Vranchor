@@ -17,6 +17,7 @@ class VideoController extends Controller
     public function sliceUpload(Request $request)
     {
 
+        
         $user = \Auth::user();
         if($user){
         try {
