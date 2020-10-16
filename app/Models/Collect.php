@@ -4,10 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Uploadlogin extends Model
+class Collect extends Model
 {
     //
-    protected $table = 'uploadlogin';
+    protected $table = 'collect';
     public $timestamps = true;
-
 }

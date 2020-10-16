@@ -71,6 +71,7 @@ class UserController extends Controller
         try {
             //规则
             $rules = [
+                'username'=>'required',
                 'mobile'=>'required',
                 'code'=>'required',
                 'newPassword'=>'required',
@@ -85,6 +86,7 @@ class UserController extends Controller
             ];
             $this->validate($request, $rules, $messages);
 
+            $username = $request->input('username');
             $mobile = $request->input('mobile');
             $code = $request->input('code');
             $newPassword = $request->input('newPassword');
@@ -92,13 +94,13 @@ class UserController extends Controller
             if(!($newPassword == $cfmPassword)){
                 return json_encode(['errcode'=>'1002','errmsg'=>'密码不一致'],JSON_UNESCAPED_UNICODE );
             }
-            $user = Users::where('mobile',$mobile)->where('status',1)->first();
+            $user = Users::where('username',$username)->where('status',1)->first();
 
             if(!isset($user->mobile)){
                 return json_encode(['errcode'=>'1002','errmsg'=>'用户手机号不存在'],JSON_UNESCAPED_UNICODE );
             }
             if(!($user->mobile == $mobile)){
-                return json_encode(['errcode'=>'1002','errmsg'=>'手机号不一致'],JSON_UNESCAPED_UNICODE );
+                return json_encode(['errcode'=>'1002','errmsg'=>'账号对应手机号不一致'],JSON_UNESCAPED_UNICODE );
             }
             $checkcode = Sms::checkCode($mobile,$code);
             if(is_array($checkcode)){

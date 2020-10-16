@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Collect;
+use App\Models\Playcollect;
+use App\Models\Playhistory;
 use App\Models\Uploadlogin;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
+use FFMpeg\Format\Audio\Mp3;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -27,11 +31,15 @@ class VideoController extends Controller
                 'blob_num'=>'required',
                 'total_blob_num'=>'required',
                 'file_name'=>'required',
+                'file_title'=>'required',
+                'file_type'=>'required',
                 'remark'=>'required',
             ];
             //自定义消息
             $messages = [
                 'file.required' => '视频文件不能为空',
+                'file_title.required' => '视频文件标题不能为空',
+                'file_type.required' => '视频文件分类不能为空',
                 'blob_num.required' => '文件当前分片数不能为空',
                 'total_blob_num.required' => '文件分片总数不能为空',
                 'file_name.required' => '文件名不能为空',
@@ -46,7 +54,15 @@ class VideoController extends Controller
             $realPath = $file->getRealPath(); //临时文件的绝对路径
             $filesize = $file->getSize();
             $remark = $request->get('remark');
+            $file_title = $request->get('file_title');
+            $file_type = $request->get('file_type');
 
+//            $mpfile = $request->file('mp');
+//            $mprealPath = $mpfile->getRealPath();
+//            $mpfile_name = $mpfile->getClientOriginalName();
+//            $mppath = 'slice/'.date('Ynd');
+//            $mpfilename = $mppath.'/'.$mpfile_name;
+//            $mpup = Storage::disk('local')->put($mpfilename,file_get_contents($mprealPath));
 
             // 存储地址
             $path = 'slice/'.date('Ymd')  ;
@@ -54,7 +70,9 @@ class VideoController extends Controller
 
             //上传
             $upload = Storage::disk('local')->put($filename, file_get_contents($realPath));
-
+//            $mpblob = Storage::disk('local')->get($path.'/'.$mpfile_name);
+//            $this->file_force_contents(public_path('uploads').'/'.$path.'/'.$mpfile_name,$mpblob,FILE_APPEND);
+//            Storage::disk('local')->delete($path.'/'.$mpfile_name);
             //判断是否是最后一块，如果是则进行文件合成并且删除文件块
             if($blob_num == $total_blob_num){
                 for($i=1; $i<= $total_blob_num; $i++){
@@ -68,6 +86,7 @@ class VideoController extends Controller
                 for($i=1; $i<= $total_blob_num; $i++){
                     Storage::disk('local')->delete($path.'/'. $file_name.'_'.$i);
                 }
+
                 //生成缩略图
                 $ffmpeg = FFMpeg::create([
                     'ffmpeg.binaries'  => 'C:/phpstudy_pro/Extensions/php/php7.3.4nts/ffmpeg-N-99404-g56ff01e6ec-win64-gpl-shared/bin/ffmpeg.exe',
@@ -78,6 +97,9 @@ class VideoController extends Controller
                 $video = $ffmpeg->open(public_path('uploads').'/'.$path.'/'.$file_name);
                 $img_dir = base_path('public/uploads/video/'.$file_name.'_res.jpg');
                 $video->frame(TimeCode::fromSeconds(1))->save($img_dir);
+//                $advan = $ffmpeg->openAdvanced(array(public_path('uploads').'/'.$path.'/'.$file_name));
+//                $advan->map(array('0:a'),new Mp3(),public_path('uploads').'/'.$path.'/'.$mpfile_name)
+//                    ->save();
             }
             if ($upload){
                 //$user = \Auth::user();
@@ -93,6 +115,8 @@ class VideoController extends Controller
                 $uploadlogin->slicesize = $this->sizecount($filesize);
                 $uploadlogin->pvnum = 0;
                 $uploadlogin->uvnum = 0;
+                $uploadlogin->file_title = $file_title;
+                $uploadlogin->file_type = $file_type;
                 if ($uploadlogin->save()){
                     return json_encode(['errcode'=>1,'errmsg'=>"上传成功"],JSON_UNESCAPED_UNICODE);
                 }
@@ -174,4 +198,140 @@ class VideoController extends Controller
         }
 
     }
+
+    //视频播放
+    public function sliceplay(Request $request){
+        $user = \Auth::user();
+        if ($user){
+            try {
+                //规则
+                $rules = [
+                    'sliceid'=>'required',
+                ];
+                //自定义消息
+                $messages = [
+                    'sliceid.required' => '视频id不能为空',
+                ];
+                $this->validate($request, $rules, $messages);
+                $sliceid = $request->input('sliceid');
+                if(Playhistory::where('sliceid',$sliceid)->where('userid',$user->id)->first()){
+                    $a = Playhistory::where('sliceid',$sliceid)->where('userid',$user->id)->update(['addtime'=>date('Y-m-d H:i:s')]);
+                }else{
+                    $history = new Playhistory();
+                    $history->sliceid = $sliceid;
+                    $history->userid = $user->id;
+                    $history->year = date('Y');
+                    $history->month = date('m');
+                    $history->day = date('d');
+                    $a = $history->save();
+                }
+
+                if ($a){
+                    $playcollect = new Playcollect();
+                    $nowtime = date('Y-m-d');
+                    $lasttime = date("Y-m-d",strtotime("+1 day"));
+                    if(Playcollect::where('sliceid',$sliceid)->where('addtime','>',$nowtime)->where('addtime','<',$lasttime)->first()){
+                        if(Playcollect::where('sliceid',$sliceid)->increment('playnum')){
+                            Uploadlogin::where('id',$sliceid)->increment('pvnum');
+                            return json_encode(['errcode'=>1,'errmsg'=>"播放量增一成功"],JSON_UNESCAPED_UNICODE);
+                        }else{
+                            return json_encode(['errcode'=>1,'errmsg'=>"播放量增一失败"],JSON_UNESCAPED_UNICODE);
+                        }
+                    }else{
+                        $playcollect->sliceid = $sliceid;
+                        $playcollect->playnum = 1;
+                        $playcollect->collect = 0;
+                        $playcollect->year = date('Y');
+                        $playcollect->month = date('m');
+                        $playcollect->day = date('d');
+
+                        if ($playcollect->save()){
+                            Uploadlogin::where('id',$sliceid)->increment('pvnum');
+                            return json_encode(['errcode'=>1,'errmsg'=>"播放量增一成功"],JSON_UNESCAPED_UNICODE);
+                        }
+                        return json_encode(['errcode'=>1,'errmsg'=>"播放量增一失败"],JSON_UNESCAPED_UNICODE);
+                    }
+                }
+
+
+
+
+            }catch (ValidationException $validationException){
+                $messages = $validationException->validator->getMessageBag()->first();
+                return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
+            }
+
+        }else{
+            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+        }
+    }
+
+
+    //视频收藏
+    public function slicecollect(Request $request){
+        $user = \Auth::user();
+        if ($user){
+            try {
+                //规则
+                $rules = [
+                    'sliceid'=>'required',
+                ];
+                //自定义消息
+                $messages = [
+                    'sliceid.required' => '视频id不能为空',
+                ];
+                $this->validate($request, $rules, $messages);
+                $sliceid = $request->input('sliceid');
+                if (Collect::where('sliceid',$sliceid)->where('userid',$user->id)->first()){
+                     return json_encode(['errcode'=>1006,'errmsg'=>"该视频你已收藏"],JSON_UNESCAPED_UNICODE);
+                }
+                $collect = new Collect();
+                $collect->sliceid = $sliceid;
+                $collect->userid = $user->id;
+                $collect->year = date('Y');
+                $collect->month = date('m');
+                $collect->day = date('d');
+                if($collect->save()){
+                        Uploadlogin::where('id',$sliceid)->increment('uvnum');
+                        $playcollect = new Playcollect();
+                        $nowtime = date('Y-m-d');
+                        $lasttime = date("Y-m-d",strtotime("+1 day"));
+                        if(Playcollect::where('sliceid',$sliceid)->where('addtime','>',$nowtime)->where('addtime','<',$lasttime)->first()){
+                            if(Playcollect::where('sliceid',$sliceid)->increment('collect')){
+                                return json_encode(['errcode'=>1,'errmsg'=>"收藏成功"],JSON_UNESCAPED_UNICODE);
+                            }else{
+                                return json_encode(['errcode'=>1008,'errmsg'=>"收藏量增一失败"],JSON_UNESCAPED_UNICODE);
+                            }
+                        }else{
+                            $playcollect->sliceid = $sliceid;
+                            $playcollect->playnum = 0;
+                            $playcollect->collect = 1;
+                            $playcollect->year = date('Y');
+                            $playcollect->month = date('m');
+                            $playcollect->day = date('d');
+
+                            if ($playcollect->save()){
+                                Uploadlogin::where('id',$sliceid)->increment('uvnum');
+                                return json_encode(['errcode'=>1,'errmsg'=>"收藏成功"],JSON_UNESCAPED_UNICODE);
+                            }
+                            return json_encode(['errcode'=>1008,'errmsg'=>"播放量增一失败"],JSON_UNESCAPED_UNICODE);
+                        }
+                }else{
+                    return json_encode(['errcode'=>1008,'errmsg'=>"收藏失败"],JSON_UNESCAPED_UNICODE);
+                }
+
+
+
+
+            }catch (ValidationException $validationException){
+                $messages = $validationException->validator->getMessageBag()->first();
+                return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
+            }
+
+        }else{
+            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+        }
+    }
+
+
 }

@@ -22,6 +22,8 @@ class CreateUploadloginTable extends Migration
             //filename filepath username uid addtime  thumname thumpath status
             $table->string('filename')->comment('视频名称');
             $table->string('filepath')->comment('视频路径');
+            $table->string('file_title')->comment('视频标题');
+            $table->string('file_type')->comment('视频分类');
             $table->integer('uid')->comment('用户id');
             $table->string('username')->comment('用户名称');
             $table->string('thumname')->comment('缩略图名称');

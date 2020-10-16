@@ -41,13 +41,13 @@ class LoginController extends Controller
             $password = $request->input('password');
             $mobile = $request->input('mobile');
 
-
             $user = new Users();
             $user->username = $username;
             $user->password =  Hash::make($password);
             $user->mobile = $mobile;
             $user->status = 1;
             $user->role = 2;//默认为普通用户
+            $user->head_portrait = 'img/head_port.png';
             $a = $user->save();
             if($a){
                 return json_encode(['errcode'=>1,'errmsg'=>'ok']);
@@ -105,6 +105,7 @@ class LoginController extends Controller
                         $data['id'] = $user->id;
                         $data['username'] = $user->username;
                         $data['role'] = $user->role;
+                        $data['head_port'] = $user->head_portrait;
                         $data['token'] = 'bearer ' . $token;
                         return json_encode(['errcode'=>'1','errmsg'=>$messages,'data'=>$data],JSON_UNESCAPED_UNICODE );
                     }else{
@@ -128,6 +129,7 @@ class LoginController extends Controller
                         $data['id'] = $user->id;
                         $data['username'] = $user->username;
                         $data['role'] = $user->role;
+                        $data['head_port'] = $user->head_portrait;
                         $data['token'] = 'bearer ' . $token;
                         return json_encode(['errcode'=>'1','errmsg'=>$messages,'data'=>$data],JSON_UNESCAPED_UNICODE );
                     }else{
