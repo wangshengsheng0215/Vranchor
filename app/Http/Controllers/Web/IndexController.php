@@ -15,17 +15,18 @@ class IndexController extends Controller
     public function index(Request $request){
 
         $user = \Auth::user();
-        if($user){
-           $role = $user->role;
-           if($role == 1){
-             //管理员权限
-           }elseif ($role == 2){
+       // dd($user);
+        if($user) {
+            $role = $user->role;
+            if ($role == 1) {
+                //管理员权限
+            } elseif ($role == 2) {
 
-               //普通用户权限
-               //昨日播放量最多的视频前10条
-               $nowtime = date('Y-m-d');
-               $lasttime = date("Y-m-d",strtotime("-1 day"));
-               $sql1 = 'SELECT
+                //普通用户权限
+                //昨日播放量最多的视频前10条
+                $nowtime = date('Y-m-d');
+                $lasttime = date("Y-m-d", strtotime("-1 day"));
+                $sql1 = 'SELECT
                         t1.sliceid,
                         t1.playnum,
                         t2.id,
@@ -41,9 +42,9 @@ class IndexController extends Controller
                         FROM playcollect t1
                         INNER JOIN uploadlogin t2 ON t1.sliceid = t2.id
                          WHERE status = 1 AND t1.addtime > ? AND t1.addtime < ? ORDER BY t1.playnum DESC LIMIT 0,4';
-               //$sqlTmp = sprintf($sql,$lasttime,$nowtime);
-               $data1 = DB::select($sql1,[$lasttime,$nowtime]);
-               $sql2 = 'SELECT
+                //$sqlTmp = sprintf($sql,$lasttime,$nowtime);
+                $data1 = DB::select($sql1, [$lasttime, $nowtime]);
+                $sql2 = 'SELECT
                         id as sliceid,
                         pvnum as playnum,
                         id,
@@ -57,8 +58,8 @@ class IndexController extends Controller
                         status,
                         addtime
                          FROM uploadlogin WHERE status = 1 ORDER BY addtime DESC LIMIT 0,4';
-               $data2 = DB::select($sql2);
-               $sql3 = 'SELECT
+                $data2 = DB::select($sql2);
+                $sql3 = 'SELECT
                         t1.id as sliceid,
                         t1.pvnum as palynum,
                         t1.id,
@@ -75,25 +76,26 @@ class IndexController extends Controller
                         (SELECT COUNT(*)  FROM uploadlogin
                         WHERE  file_type = t1.file_type AND addtime > t1.addtime HAVING status = 1 AND COUNT(*) < 4 )
                         ORDER BY t1.file_type ';
-               $data3 = DB::select($sql3);
-               $typelist = DB::select('SELECT id,name FROM slicetype');
-               $data = [];
-               $filetype = [];
-               foreach ($typelist as $k=>$v){
-                   $filetype[$v->id] = $v->name;
-               }
-               $data['filetype'] = $filetype;
-               $data['lastpaly'] = $data1;
-               $data['newslice'] = $data2;
-               $data['typeslice'] = $data3;
-              return  json_encode(['errcode'=>'1','errmsg'=>'ok','data'=>$data],JSON_UNESCAPED_UNICODE);
+                $data3 = DB::select($sql3);
+                $typelist = DB::select('SELECT id,name FROM slicetype');
+                $data = [];
+                $filetype = [];
+                foreach ($typelist as $k => $v) {
+                    $filetype[$v->id] = $v->name;
+                }
+                $data['filetype'] = $filetype;
+                $data['lastpaly'] = $data1;
+                $data['newslice'] = $data2;
+                $data['typeslice'] = $data3;
+                return json_encode(['errcode' => '1', 'errmsg' => 'ok', 'data' => $data], JSON_UNESCAPED_UNICODE);
 
-           }else{
-               return json_encode(['errcode'=>'401','errmsg'=>'该权限不存在'],JSON_UNESCAPED_UNICODE);
-           }
-        }else{
-            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+            } else {
+                return json_encode(['errcode' => '401', 'errmsg' => '该权限不存在'], JSON_UNESCAPED_UNICODE);
+            }
         }
+//        }else{
+//            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+//        }
     }
 
     //更多视频
