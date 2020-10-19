@@ -41,7 +41,10 @@ class CheckLogin  extends BaseMiddleware
 
                 // 刷新用户的 token
                 $token = $this->auth->refresh();
-               // $request->headers->set('Authorization','Bearer '.$token); // 给当前的请求设置性的token,以备在本次请求中需要调用用户信息
+                $next($request)->headers->set('Access-Control-Allow-Headers','Authorization');
+                $next($request)->headers->set('Authorization','Bearer '.$token); // 给当前的请求设置性的token,以备在本次请求中需要调用用户信息
+
+
                 // 使用一次性登录以保证此次请求的成功
                 Auth::guard('api')->onceUsingId($this->auth->manager()->getPayloadFactory()->buildClaimsCollection()->toPlainArray()['sub']);
             } catch (JWTException $exception) {
@@ -52,6 +55,7 @@ class CheckLogin  extends BaseMiddleware
             }
         }
         // 在响应头中返回新的 token
+        $next($request)->headers->set('Access-Control-Allow-Headers','Authorization');
         return $this->setAuthenticationHeader($next($request), $token);
     }
 }
