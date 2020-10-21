@@ -16,10 +16,9 @@ Route::post('web/vranchor/register','Web\LoginController@register');
 //Route::get('/', function () {return view('homepage');}); //首页
 //Route::get('test','Web\TestController@test');//测试
 //Route::post('sliceUpload','Web\TestController@sliceUpload');//上传
-//Route::get('sliceDownload','Web\TestController@sliceDownload');//下载
+Route::get('sliceDownload','Web\TestController@sliceDownload');//下载
 //Route::get('list','Web\TestController@list');
 Route::group(['prefix'=>'web','middleware'=>'check.login'],function (){
-    Route::get('vranchor/slicelist','Web\VideoController@slicelist');
     Route::get('vranchor/index','Web\IndexController@index');  //首页
     Route::get('vranchor/userlist','Web\UserController@userlist'); //用户列表
     Route::get('vranchor/userinfo','Web\UserController@userinfo'); //用户信息
@@ -30,4 +29,21 @@ Route::group(['prefix'=>'web','middleware'=>'check.login'],function (){
     Route::post('vranchor/mycollect','Web\IndexController@mycollect'); //我的收藏
     Route::post('vranchor/myhistory','Web\IndexController@myhistory'); //历史记录
     Route::post('vranchor/search','Web\IndexController@search');//搜索
+    Route::post('vranchor/cancelcollect','Web\IndexController@cancelcollect'); //取消收藏
 });
+
+Route::group(['prefix'=>'admin','middleware'=>'check.login'],function (){
+    Route::get('vranchor/index','Admin\IndexController@index');  //首页m,,,,,,,,,,,,kkkkkkkkkkkkkkkkkkk,mkkkkkkkkkkkkkkkjjjjjjjjjk
+    Route::get('vranchor/userinfo','Admin\UserController@userinfo'); //用户信息
+    Route::post('vranchor/updateinfo','Admin\UserController@updateinfo'); //修改用户信息
+    Route::post('vranchor/updatepassword','Admin\UserController@updatepassword'); //修改密码
+    Route::get('vranchor/userlist','Admin\UserController@userlist'); //用户列表
+    Route::get('vranchor/slicelist','Admin\VideoController@slicelist');//视频列表
+    Route::post('vranchor/updatestatus','Admin\VideoController@updatestatus');//修改状态
+    Route::post('vranchor/deleteslice','Admin\VideoController@deleteslice');//删除视频
+    Route::post('vranchor/batchupdatestatus','Admin\VideoController@batchupdatestatus');//批量修改状态
+    Route::post('vranchor/batchdeleteslice','Admin\VideoController@batchdeleteslice');//批量删除视频
+
+});
+
+

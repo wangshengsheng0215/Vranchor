@@ -11,6 +11,7 @@ use FFMpeg\FFMpeg;
 use FFMpeg\Format\Audio\Mp3;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
@@ -167,7 +168,7 @@ class VideoController extends Controller
     public function sliceDownload()
     {
 
-        $path = 'slice/'.date('Ymd') ;
+        $path = 'slice/20201013' ;
 
         $filename = $path .'/'. '02248b1d5b1de297b64d747135688fcc.mp4' ;
         //获取文件资源
@@ -332,6 +333,105 @@ class VideoController extends Controller
             return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
         }
     }
+
+    //视频信息
+    public function sliceinfo(Request $request){
+        $user = \Auth::user();
+        if ($user){
+            try {
+                //规则
+                $rules = [
+                    'sliceid'=>'required',
+                ];
+                //自定义消息
+                $messages = [
+                    'sliceid.required' => '视频id不能为空',
+                ];
+                $this->validate($request, $rules, $messages);
+                $sliceid = $request->input('sliceid');
+                $sql = 'SELECT
+                        id as sliceid,
+                        pvnum as playnum,
+                        id,
+                        file_title,
+                        file_type,
+                        remark,
+                        filepath,
+                        thumpath,
+                        uid,
+                        username,
+                        status,
+                        addtime
+                         FROM uploadlogin WHERE id = ? ';
+                $info = DB::select($sql,[$sliceid]);
+
+                $collcet = Collect::where('sliceid',$sliceid)->where('userid',$user->id)->first();
+                $data = [];
+                $data['list'] = $info;
+                if($collcet){
+                    $data['collect'] = 1;
+                }else{
+                    $data['collect'] = 2;
+                }
+                return json_encode(['errcode' => '1', 'errmsg' => 'ok', 'data' => $data], JSON_UNESCAPED_UNICODE);
+            }catch (ValidationException $validationException){
+                $messages = $validationException->validator->getMessageBag()->first();
+                return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
+            }
+
+        }else{
+            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+        }
+    }
+
+    //相关推荐
+    public function slicerecommend(Request $request){
+        $user = \Auth::user();
+        if($user){
+                //规则
+                try {
+                    $rules = [
+                        'file_type'=>'required',
+                    ];
+                    //自定义消息
+                    $messages = [
+                        'file_type.required' => '视频分类值不能为空',
+                    ];
+
+                    $this->validate($request, $rules, $messages);
+
+                    $file_type = $request->file_type;
+                    $sql2 = 'SELECT
+                        id as sliceid,
+                        pvnum as playnum,
+                        id,
+                        file_title,
+                        file_type,
+                        remark,
+                        filepath,
+                        thumpath,
+                        uid,
+                        username,
+                        status,
+                        addtime
+                         FROM uploadlogin WHERE status = 1 AND file_type = ? ORDER BY addtime DESC';
+                    $data2 = DB::select($sql2,[$file_type]);
+                    $data = [];
+                    $data['slicerecommend'] = $data2;
+
+                    return  json_encode(['errcode'=>'1','errmsg'=>'ok','data'=>$data],JSON_UNESCAPED_UNICODE);
+                }catch (ValidationException $validationException){
+                    $messages = $validationException->validator->getMessageBag()->first();
+                    return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
+                }
+
+        }else{
+            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+        }
+    }
+
+
+
 
 
 }

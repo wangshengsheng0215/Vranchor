@@ -28,4 +28,7 @@ Route::group(['prefix'=>'vranchor','middleware'=>'check.login'],function (){
     Route::post('sliceUpload','APi\VideoController@sliceUpload');//上传视频
     Route::post('sliceplay','Api\VideoController@sliceplay');//视频播放
     Route::post('slicecollect','Api\VideoController@slicecollect');//视频收藏
+    Route::get('sliceDownload','Api\VideoController@sliceDownload');//视频下载
+    Route::post('sliceinfo','Api\VideoController@sliceinfo');//视频信息
+    Route::post('slicerecommend','Api\VideoController@slicerecommend');//视频推荐
 });

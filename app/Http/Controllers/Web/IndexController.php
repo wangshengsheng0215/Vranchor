@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Models\Collect;
 use App\Models\Playcollect;
 use App\Models\Uploadlogin;
 use Illuminate\Http\Request;
@@ -156,7 +157,7 @@ class IndexController extends Controller
                         addtime
                          FROM uploadlogin WHERE status = 1 AND file_type = %s ORDER BY addtime DESC';
                     $sql2Tmp = sprintf($sql2,$file_type);
-                    $data2 = DB::table(DB::raw("($sql2Tmp) as t"))->paginate(1);
+                    $data2 = DB::table(DB::raw("($sql2Tmp) as t"))->paginate(10);
                     $data = [];
                     $data['lastpaly'] = $data1;
                     $data['newslice'] = $data2;
@@ -235,6 +236,35 @@ class IndexController extends Controller
             $data['list'] = $list;
             $data['shenhenum'] = $shenhenum;
             return  json_encode(['errcode'=>'1','errmsg'=>'ok','data'=>$data],JSON_UNESCAPED_UNICODE);
+
+        }else{
+            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+        }
+    }
+
+    //取消收藏
+    public function cancelcollect(Request $request){
+        $user = \Auth::user();
+        if($user){
+            $uid = $user->id;
+            //规则
+            try {
+                $rules = [
+                    'sliceid'=>'required',
+                ];
+                //自定义消息
+                $messages = [
+                    'sliceid.required' => '视频id不能为空',
+                ];
+
+                $this->validate($request, $rules, $messages);
+                $sliceid = $request->sliceid;
+                Collect::where('sliceid',$sliceid)->where('userid',$user->id)->delete();
+                return json_encode(['errcode'=>'1','errmsg'=>'取消成功'],JSON_UNESCAPED_UNICODE );
+            }catch (ValidationException $validationException){
+                $messages = $validationException->validator->getMessageBag()->first();
+                return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
+            }
 
         }else{
             return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );

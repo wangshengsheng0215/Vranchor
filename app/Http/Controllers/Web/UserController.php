@@ -72,11 +72,11 @@ class UserController extends Controller
            $name = $request->input('name');
            $headfile = $request->file('headfile');
            if($headfile){
-              $result = $uploadhandler->save($headfile,'headport'.$user->id);
+              $result = $uploadhandler->save($headfile,'headport',$user->id);
               if($result){
                   $data['headport'] = $result['path'];
               }
-               $user->head_portrait = $data['headport'];
+               $user->head_portrait = strstr($data['headport'],'uploads');
            }
 
            $user->name = $name;
