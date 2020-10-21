@@ -414,7 +414,7 @@ class VideoController extends Controller
                         username,
                         status,
                         addtime
-                         FROM uploadlogin WHERE status = 1 AND file_type = ? ORDER BY addtime DESC';
+                         FROM uploadlogin WHERE status = 1 AND file_type = ? ORDER BY addtime DESC limit 0,6';
                     $data2 = DB::select($sql2,[$file_type]);
                     $data = [];
                     $data['slicerecommend'] = $data2;
@@ -424,6 +424,35 @@ class VideoController extends Controller
                     $messages = $validationException->validator->getMessageBag()->first();
                     return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
                 }
+
+        }else{
+            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+        }
+    }
+
+    //取消收藏
+    public function cancelcollect(Request $request){
+        $user = \Auth::user();
+        if($user){
+            $uid = $user->id;
+            //规则
+            try {
+                $rules = [
+                    'sliceid'=>'required',
+                ];
+                //自定义消息
+                $messages = [
+                    'sliceid.required' => '视频id不能为空',
+                ];
+
+                $this->validate($request, $rules, $messages);
+                $sliceid = $request->sliceid;
+                Collect::where('sliceid',$sliceid)->where('userid',$user->id)->delete();
+                return json_encode(['errcode'=>'1','errmsg'=>'取消成功'],JSON_UNESCAPED_UNICODE );
+            }catch (ValidationException $validationException){
+                $messages = $validationException->validator->getMessageBag()->first();
+                return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
+            }
 
         }else{
             return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );

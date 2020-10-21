@@ -31,4 +31,5 @@ Route::group(['prefix'=>'vranchor','middleware'=>'check.login'],function (){
     Route::get('sliceDownload','Api\VideoController@sliceDownload');//视频下载
     Route::post('sliceinfo','Api\VideoController@sliceinfo');//视频信息
     Route::post('slicerecommend','Api\VideoController@slicerecommend');//视频推荐
+    Route::post('cancelcollect','Api\VideoController@cancelcollect'); //取消收藏
 });
