@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Collect;
 use App\Models\Playcollect;
 use App\Models\Playhistory;
+use App\Models\Slicedown;
 use App\Models\Uploadlogin;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
@@ -180,9 +181,10 @@ class VideoController extends Controller
                 ];
                 $this->validate($request, $rules, $messages);
                 $sliceid = $request->input('sliceid');
-
-                    $path = $request->input('path');
-
+                $slice = Uploadlogin::where('id',$sliceid)->first();
+                if ($slice){
+                    $path = $slice->filepath;
+                    //$path = $request->input('path');
                     $filename = strstr($path,'slice');
                     //获取文件资源
                     $file = Storage::disk('uploads')->readStream($filename);
@@ -210,6 +212,31 @@ class VideoController extends Controller
                         //flush();     //增加的
                         sleep(1);
                     }
+                    $slicedown = new Slicedown();
+                    $nowtime = date('Y-m-d');
+                    $lasttime = date("Y-m-d",strtotime("+1 day"));
+                    if(Slicedown::where('sliceid',$sliceid)->where('addtime','>',$nowtime)->where('addtime','<',$lasttime)->first()){
+                        if(Slicedown::where('sliceid',$sliceid)->increment('downnum')){
+                           // Uploadlogin::where('id',$sliceid)->increment('pvnum');
+                            return json_encode(['errcode'=>1,'errmsg'=>"播放量增一成功"],JSON_UNESCAPED_UNICODE);
+                        }else{
+                            return json_encode(['errcode'=>1,'errmsg'=>"播放量增一失败"],JSON_UNESCAPED_UNICODE);
+                        }
+                    }else{
+                        $slicedown->sliceid = $sliceid;
+                        $slicedown->downnum = 1;;
+                        $slicedown->year = date('Y');
+                        $slicedown->month = date('m');
+                        $slicedown->day = date('d');
+
+                        if ($slicedown->save()){
+                            //Uploadlogin::where('id',$sliceid)->increment('pvnum');
+                            return json_encode(['errcode'=>1,'errmsg'=>"播放量增一成功"],JSON_UNESCAPED_UNICODE);
+                        }
+                        return json_encode(['errcode'=>1,'errmsg'=>"播放量增一失败"],JSON_UNESCAPED_UNICODE);
+                    }
+                }
+
             }catch (ValidationException $validationException){
                 $messages = $validationException->validator->getMessageBag()->first();
                 return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
