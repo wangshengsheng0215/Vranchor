@@ -22,9 +22,9 @@ class VideoController extends Controller
             }
             $list = Uploadlogin::whereRaw($where)->orderBy('addtime','desc')->paginate(10);
             foreach ($list as $v){
-                if($v->status == 1){
+                if($v->status == 2){
                     $v->statuscn = '待审核';
-                }elseif ($v->status == 2){
+                }elseif ($v->status == 1){
                     $v->statuscn = '上架';
                 }elseif ($v->status == 3){
                     $v->statuscn = '下架';
@@ -57,7 +57,7 @@ class VideoController extends Controller
                     $this->validate($request, $rules, $messages);
                     $sliceid = $request->input('sliceid');
                     $status = $request->input('status');  //通过即为上架，不通过即为下架
-                    //通过传2 不通过传3 下架传3 上架传2
+                    //通过传1 不通过传3 下架传3 上架传1
                     Uploadlogin::where('id',$sliceid)->update(['status'=>$status]);
                     return json_encode(['errcode'=>'1','errmsg'=>'更新成功'],JSON_UNESCAPED_UNICODE );
 

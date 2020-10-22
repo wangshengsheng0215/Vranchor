@@ -111,7 +111,7 @@ class VideoController extends Controller
                 $uploadlogin->username = $user->username;
                 $uploadlogin->thumname = $file_name.'_res.jpg';
                 $uploadlogin->thumpath = 'uploads/video/'.$file_name.'_res.jpg';
-                $uploadlogin->status = 1;
+                $uploadlogin->status = 2;
                 $uploadlogin->remark = $remark;
                 $uploadlogin->slicesize = $this->sizecount($filesize);
                 $uploadlogin->pvnum = 0;
@@ -165,39 +165,58 @@ class VideoController extends Controller
 
 
     //文件下载
-    public function sliceDownload()
+    public function sliceDownload(Request $request)
     {
+        $user = \Auth::user();
+        if($user){
+            try {
+                //规则
+                $rules = [
+                    'sliceid'=>'required',
+                ];
+                //自定义消息
+                $messages = [
+                    'sliceid.required' => '视频id不能为空',
+                ];
+                $this->validate($request, $rules, $messages);
+                $sliceid = $request->input('sliceid');
 
-        $path = 'slice/20201013' ;
+                    $path = $request->input('path');
 
-        $filename = $path .'/'. '02248b1d5b1de297b64d747135688fcc.mp4' ;
-        //获取文件资源
-        $file = Storage::disk('uploads')->readStream($filename);
-        //获取文件大小
-        $fileSize = Storage::disk('uploads')->size($filename);
-        header("Content-type:application/octet-stream");//设定header头为下载
-        header("Accept-Ranges:bytes");
-        header("Accept-Length:".$fileSize);//响应大小
-        header("Content-Disposition: attachment; filename=$filename");//文件名
+                    $filename = strstr($path,'slice');
+                    //获取文件资源
+                    $file = Storage::disk('uploads')->readStream($filename);
+                    //获取文件大小
+                    $fileSize = Storage::disk('uploads')->size($filename);
+                    header("Content-type:application/octet-stream");//设定header头为下载
+                    header("Accept-Ranges:bytes");
+                    header("Accept-Length:".$fileSize);//响应大小
+                    header("Content-Disposition: attachment; filename=$filename");//文件名
 
-        //不设置的话要等缓冲区满之后才会响应
-        ob_end_clean();//缓冲区结束
-        ob_implicit_flush();//强制每当有输出的时候,即刻把输出发送到浏览器\
-        header('X-Accel-Buffering: no'); // 不缓冲数据
+                    //不设置的话要等缓冲区满之后才会响应
+                    ob_end_clean();//缓冲区结束
+                    ob_implicit_flush();//强制每当有输出的时候,即刻把输出发送到浏览器\
+                    header('X-Accel-Buffering: no'); // 不缓冲数据
 
-        $limit=1024*1024;
-        $count=0;
+                    $limit=1024*1024;
+                    $count=0;
 
-        //限制每秒的速率
-        while($fileSize-$count>0){//循环读取文件数据
-            $data=fread($file,$limit);
-            $count+=$limit;
-            echo $data;//输出文件
-            //ob_flush();//增加的.
-            //flush();     //增加的
-            sleep(1);
+                    //限制每秒的速率
+                    while($fileSize-$count>0){//循环读取文件数据
+                        $data=fread($file,$limit);
+                        $count+=$limit;
+                        echo $data;//输出文件
+                        //ob_flush();//增加的.
+                        //flush();     //增加的
+                        sleep(1);
+                    }
+            }catch (ValidationException $validationException){
+                $messages = $validationException->validator->getMessageBag()->first();
+                return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
+            }
+        }else{
+            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
         }
-
     }
 
     //视频播放
