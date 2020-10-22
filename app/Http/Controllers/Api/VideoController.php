@@ -7,6 +7,7 @@ use App\Models\Playcollect;
 use App\Models\Playhistory;
 use App\Models\Slicedown;
 use App\Models\Uploadlogin;
+use App\Service\ImageUploadhandler;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
 use FFMpeg\Format\Audio\Mp3;
@@ -503,6 +504,34 @@ class VideoController extends Controller
         }else{
             return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
         }
+    }
+
+
+    //文件上传
+    public function fileuploads(Request $request,ImageUploadhandler $uploadhandler){
+        $user = \Auth::user();
+        $fname = $request->input('fname');
+        if($fname == 'headfile'){
+            $headfile = $request->file('headfile');
+            $result = $uploadhandler->save($headfile,'headport',$user->id);
+            if($result){
+                $data['headport'] = $result['path'];
+            }
+            $path = strstr($data['headport'],'uploads');
+            return json_encode(['errcode'=>'1','errmsg'=>'上传成功','data'=>$path],JSON_UNESCAPED_UNICODE );
+
+        }elseif ($fname == 'logofile'){
+            $logofile = $request->file('logofile');
+            $result1 = $uploadhandler->save($logofile,'logo',$user->id);
+            if($result1){
+                $data['logo'] = $result1['path'];
+
+            }
+            $path = strstr($data['logo'],'uploads');
+            return json_encode(['errcode'=>'1','errmsg'=>'上传成功','data'=>$path],JSON_UNESCAPED_UNICODE );
+        }
+        return json_encode(['errcode'=>'1','errmsg'=>'上传失败'],JSON_UNESCAPED_UNICODE );
+
     }
 
 

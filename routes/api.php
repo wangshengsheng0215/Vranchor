@@ -32,4 +32,6 @@ Route::group(['prefix'=>'vranchor','middleware'=>'check.login'],function (){
     Route::post('sliceinfo','Api\VideoController@sliceinfo');//视频信息
     Route::post('slicerecommend','Api\VideoController@slicerecommend');//视频推荐
     Route::post('cancelcollect','Api\VideoController@cancelcollect'); //取消收藏
+    Route::post('fileuploads','Api\VideoController@fileuploads'); //文件上传
+
 });
