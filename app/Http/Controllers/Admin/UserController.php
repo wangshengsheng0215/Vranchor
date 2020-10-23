@@ -35,24 +35,32 @@ class UserController extends Controller
         if($user){
             $data = [];
             $name = $request->input('name');
-            $headfile = $request->file('headfile');
-            $logofile = $request->file('logofile');
-            if($headfile){
-                $result = $uploadhandler->save($headfile,'headport',$user->id);
-                if($result){
-                    $data['headport'] = $result['path'];
-                }
-                $user->head_portrait = strstr($data['headport'],'uploads');
-            }
-            if($logofile){
-                $result1 = $uploadhandler->save($logofile,'logo',$user->id);
-                if($result1){
-                    $data['logo'] = $result1['path'];
-
-                }
-                $user->logo = strstr($data['logo'],'uploads');
-            }
+            $headfilepath = $request->input('headfile');
+            $logofilepath = $request->input('logofile');
+//            $headfile = $request->file('headfile');
+//            $logofile = $request->file('logofile');
+//            if($headfile){
+//                $result = $uploadhandler->save($headfile,'headport',$user->id);
+//                if($result){
+//                    $data['headport'] = $result['path'];
+//                }
+//                $user->head_portrait = strstr($data['headport'],'uploads');
+//            }
+//            if($logofile){
+//                $result1 = $uploadhandler->save($logofile,'logo',$user->id);
+//                if($result1){
+//                    $data['logo'] = $result1['path'];
+//
+//                }
+//                $user->logo = strstr($data['logo'],'uploads');
+//            }
             $user->name = $name;
+            if($headfilepath){
+                $user->head_portrait = $headfilepath;
+            }
+            if($logofilepath){
+                $user->logo = $logofilepath;
+            }
             $user->save();
             return json_encode(['errcode'=>'1','errmsg'=>'更新成功'],JSON_UNESCAPED_UNICODE );
         }else{
