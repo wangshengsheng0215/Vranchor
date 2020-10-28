@@ -169,8 +169,9 @@ class VideoController extends Controller
     //文件下载
     public function sliceDownload(Request $request)
     {
+
         $user = \Auth::user();
-        if($user){
+//        if($user){
             try {
                 //规则
                 $rules = [
@@ -242,9 +243,9 @@ class VideoController extends Controller
                 $messages = $validationException->validator->getMessageBag()->first();
                 return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
             }
-        }else{
-            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
-        }
+//        }else{
+//            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+//        }
     }
 
     //视频播放
