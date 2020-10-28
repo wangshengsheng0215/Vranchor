@@ -397,20 +397,35 @@ class VideoController extends Controller
                 ];
                 $this->validate($request, $rules, $messages);
                 $sliceid = $request->input('sliceid');
+//                $sql = 'SELECT
+//                        id as sliceid,
+//                        pvnum as playnum,
+//                        id,
+//                        file_title,
+//                        file_type,
+//                        remark,
+//                        filepath,
+//                        thumpath,
+//                        uid,
+//                        username,
+//                        status,
+//                        addtime
+//                         FROM uploadlogin WHERE id = ? ';
                 $sql = 'SELECT
-                        id as sliceid,
-                        pvnum as playnum,
-                        id,
-                        file_title,
-                        file_type,
-                        remark,
-                        filepath,
-                        thumpath,
-                        uid,
-                        username,
-                        status,
-                        addtime
-                         FROM uploadlogin WHERE id = ? ';
+                        t2.id as sliceid,
+                        t2.pvnum as playnum,
+                        t2.id,
+                        t2.file_title,
+                        t2.file_type,
+                        t2.remark,
+                        t2.filepath,
+                        t2.thumpath,
+                        t2.uid,
+                        t2.username,
+                        t2.status,
+						t3.head_portrait,
+                        t2.addtime
+                         FROM uploadlogin t2  INNER JOIN users t3 ON t3.id = t2.uid  WHERE t2.id = ?';
                 $info = DB::select($sql,[$sliceid]);
 
                 $collcet = Collect::where('sliceid',$sliceid)->where('userid',$user->id)->first();
