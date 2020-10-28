@@ -42,7 +42,7 @@ class IndexController extends Controller
                         t1.addtime
                         FROM playcollect t1
                         INNER JOIN uploadlogin t2 ON t1.sliceid = t2.id
-                         WHERE status = 1 AND t1.addtime > ? AND t1.addtime < ? ORDER BY t1.playnum DESC LIMIT 0,4';
+                         WHERE status = 1 AND t1.addtime > ? AND t1.addtime < ? ORDER BY t1.playnum DESC LIMIT 0,5';
                 //$sqlTmp = sprintf($sql,$lasttime,$nowtime);
                 $data1 = DB::select($sql1, [$lasttime, $nowtime]);
                 $sql2 = 'SELECT
@@ -58,7 +58,7 @@ class IndexController extends Controller
                         username,
                         status,
                         addtime
-                         FROM uploadlogin WHERE status = 1 ORDER BY addtime DESC LIMIT 0,4';
+                         FROM uploadlogin WHERE status = 1 ORDER BY addtime DESC LIMIT 0,6';
                 $data2 = DB::select($sql2);
                 $sql3 = 'SELECT
                         t1.id as sliceid,
@@ -75,7 +75,7 @@ class IndexController extends Controller
                         t1.addtime
                         FROM uploadlogin t1 WHERE EXISTS
                         (SELECT COUNT(*)  FROM uploadlogin
-                        WHERE  file_type = t1.file_type AND addtime > t1.addtime HAVING status = 1 AND COUNT(*) < 4 )
+                        WHERE  file_type = t1.file_type AND addtime > t1.addtime HAVING status = 1 AND COUNT(*) < IF(file_type=2,5,4) )
                         ORDER BY t1.file_type ';
                 $data3 = DB::select($sql3);
                 $typelist = DB::select('SELECT id,name FROM slicetype');
@@ -157,7 +157,7 @@ class IndexController extends Controller
                         addtime
                          FROM uploadlogin WHERE status = 1 AND file_type = %s ORDER BY addtime DESC';
                     $sql2Tmp = sprintf($sql2,$file_type);
-                    $data2 = DB::table(DB::raw("($sql2Tmp) as t"))->paginate(10);
+                    $data2 = DB::table(DB::raw("($sql2Tmp) as t"))->paginate(20);
                     $data = [];
                     $data['lastpaly'] = $data1;
                     $data['newslice'] = $data2;
@@ -196,7 +196,7 @@ class IndexController extends Controller
                         addtime
                          FROM uploadlogin WHERE  uid = %s ORDER BY addtime DESC';
             $sqlTmp = sprintf($sql,$uid);
-            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(10);
+            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(12);
             $shenhenum = Uploadlogin::where('uid',$uid)->where('status',2)->count(); //待审核
             $data = [];
             $data['list'] = $list;
@@ -328,7 +328,7 @@ class IndexController extends Controller
                         addtime
                          FROM uploadlogin WHERE %s ORDER BY addtime DESC" ;
             $sqlTmp = sprintf($sql,$where);
-            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(10);
+            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(12);
             $data = [];
             $data['list'] = $list;
             return  json_encode(['errcode'=>'1','errmsg'=>'ok','data'=>$data],JSON_UNESCAPED_UNICODE);

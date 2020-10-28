@@ -461,7 +461,7 @@ class VideoController extends Controller
                         username,
                         status,
                         addtime
-                         FROM uploadlogin WHERE status = 1 AND file_type = ? ORDER BY addtime DESC limit 0,6';
+                         FROM uploadlogin WHERE status = 1 AND file_type = ? ORDER BY addtime DESC limit 0,5';
                     $data2 = DB::select($sql2,[$file_type]);
                     $data = [];
                     $data['slicerecommend'] = $data2;

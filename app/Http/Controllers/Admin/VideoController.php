@@ -15,11 +15,11 @@ class VideoController extends Controller
         $user = \Auth::user();
         if($user){
             $where = ' 1=1 ';
-
             $key = $request->input('name');
             if($key != null){
                 $where.=' and file_title like "%' . $key . '%"';
             }
+
             $list = Uploadlogin::whereRaw($where)->orderBy('addtime','desc')->paginate(10);
             foreach ($list as $v){
                 if($v->status == 2){
@@ -94,7 +94,7 @@ class VideoController extends Controller
                     $this->validate($request, $rules, $messages);
                     $arrsliceid = $request->input('sliceid');
                     $status = $request->input('status');  //通过即为上架，不通过即为下架
-                    //通过传2 不通过传3 下架传3 上架传2
+                    //通过传1 不通过传3 下架传3 上架传1
                     Uploadlogin::whereIn('id',$arrsliceid)->update(['status'=>$status]);
                     return json_encode(['errcode'=>'1','errmsg'=>'更新成功'],JSON_UNESCAPED_UNICODE );
 
