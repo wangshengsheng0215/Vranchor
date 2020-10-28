@@ -391,7 +391,7 @@ class IndexController extends Controller
                         t1.addtime
                         FROM ( uploadlogin t2 INNER JOIN users t3 ON t2.uid = t3.id)
                         INNER JOIN playhistory t1 ON t1.sliceid = t2.id
-                         WHERE userid = 1 ORDER BY t1.addtime DESC';
+                         WHERE userid = %s ORDER BY t1.addtime DESC';
             $sqlTmp = sprintf($sql,$uid);
             $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(15);
             $shenhenum = Uploadlogin::where('uid',$uid)->where('status',2)->count(); //待审核
