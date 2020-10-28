@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Users;
 use App\Service\ImageUploadhandler;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -144,5 +145,50 @@ class UserController extends Controller
             return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
         }
     }
+
+
+    //修改其他用户信息
+    public function updateuserinfo(Request $request,ImageUploadhandler $uploadhandler){
+        $user = \Auth::user();
+        if($user){
+            $data = [];
+            $id = $request->input('uid');
+            $name = $request->input('name');
+            $headfilepath = $request->input('headfile');
+            $logofilepath = $request->input('logofile');
+//            $headfile = $request->file('headfile');
+//            $logofile = $request->file('logofile');
+//            if($headfile){
+//                $result = $uploadhandler->save($headfile,'headport',$user->id);
+//                if($result){
+//                    $data['headport'] = $result['path'];
+//                }
+//                $user->head_portrait = strstr($data['headport'],'uploads');
+//            }
+//            if($logofile){
+//                $result1 = $uploadhandler->save($logofile,'logo',$user->id);
+//                if($result1){
+//                    $data['logo'] = $result1['path'];
+//
+//                }
+//                $user->logo = strstr($data['logo'],'uploads');
+//            }
+            $data['name'] = $name;
+            if($headfilepath){
+                //$user->head_portrait = $headfilepath;
+                $data['head_portrait'] = $headfilepath;
+            }
+            if($logofilepath){
+                //$user->logo = $logofilepath;
+                $data['logo'] = $logofilepath;
+            }
+            Users::where('id',$id)->update($data);
+            //$user->save();
+            return json_encode(['errcode'=>'1','errmsg'=>'更新成功'],JSON_UNESCAPED_UNICODE );
+        }else{
+            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+        }
+    }
+
 
 }
