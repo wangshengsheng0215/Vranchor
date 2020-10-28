@@ -337,4 +337,13 @@ class IndexController extends Controller
         }
     }
 
+    public function filetype(Request $request){
+        $typelist = DB::select('SELECT id,name FROM slicetype');;
+        $filetype = [];
+        foreach ($typelist as $k => $v) {
+            $filetype[$v->id] = $v->name;
+        }
+        return json_encode(['errcode'=>1,'errmsg'=>'ok','data'=>$filetype]);
+    }
+
 }
