@@ -19,7 +19,7 @@ class CreateSlicedownTable extends Migration
             $table->collation = 'utf8_general_ci';
             $table->increments('id');
             $table->integer('sliceid')->comment('视频id');
-            $table->integer('downnum')->comment('下载');
+            $table->integer('downnum')->comment('下载数量');
             $table->integer('year')->comment('年份');
             $table->integer('month')->comment('月份');
             $table->integer('day')->comment('天');
