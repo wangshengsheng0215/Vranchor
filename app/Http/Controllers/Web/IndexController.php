@@ -45,21 +45,53 @@ class IndexController extends Controller
                          WHERE status = 1 AND t1.addtime > ? AND t1.addtime < ? ORDER BY t1.playnum DESC LIMIT 0,5';
                 //$sqlTmp = sprintf($sql,$lasttime,$nowtime);
                 $data1 = DB::select($sql1, [$lasttime, $nowtime]);
+//                $sql2 = 'SELECT
+//                        id as sliceid,
+//                        pvnum as playnum,
+//                        id,
+//                        file_title,
+//                        file_type,
+//                        remark,
+//                        filepath,
+//                        thumpath,
+//                        uid,
+//                        username,
+//                        status,
+//                        addtime
+//                         FROM uploadlogin WHERE status = 1 ORDER BY addtime DESC LIMIT 0,6';
                 $sql2 = 'SELECT
-                        id as sliceid,
-                        pvnum as playnum,
-                        id,
-                        file_title,
-                        file_type,
-                        remark,
-                        filepath,
-                        thumpath,
-                        uid,
-                        username,
-                        status,
-                        addtime
-                         FROM uploadlogin WHERE status = 1 ORDER BY addtime DESC LIMIT 0,6';
+                        t2.id as sliceid,
+                        t2.pvnum as playnum,
+                        t2.id,
+                        t2.file_title,
+                        t2.file_type,
+                        t2.remark,
+                        t2.filepath,
+                        t2.thumpath,
+                        t2.uid,
+                        t2.username,
+						t3.head_portrait,
+                        t2.status,
+                        t2.addtime
+                         FROM uploadlogin t2 INNER JOIN users t3 ON t2.uid = t3.id WHERE t2.status = 1 ORDER BY t2.addtime DESC LIMIT 0,6';
                 $data2 = DB::select($sql2);
+//                $sql3 = 'SELECT
+//                        t1.id as sliceid,
+//                        t1.pvnum as palynum,
+//                        t1.id,
+//                        t1.file_title,
+//                        t1.file_type,
+//                        t1.remark,
+//                        t1.filepath,
+//                        t1.thumpath,
+//                        t1.uid,
+//                        t1.username,
+//                        t1.status,
+//                        t1.addtime
+//                        FROM uploadlogin t1 WHERE EXISTS
+//                        (SELECT COUNT(*)  FROM uploadlogin
+//                        WHERE  file_type = t1.file_type AND addtime > t1.addtime HAVING status = 1 AND COUNT(*) < IF(file_type=2,5,4) )
+//                        ORDER BY t1.file_type ';
                 $sql3 = 'SELECT
                         t1.id as sliceid,
                         t1.pvnum as palynum,
@@ -71,12 +103,13 @@ class IndexController extends Controller
                         t1.thumpath,
                         t1.uid,
                         t1.username,
+						t3.head_portrait,
                         t1.status,
                         t1.addtime
-                        FROM uploadlogin t1 WHERE EXISTS
-                        (SELECT COUNT(*)  FROM uploadlogin
-                        WHERE  file_type = t1.file_type AND addtime > t1.addtime HAVING status = 1 AND COUNT(*) < IF(file_type=2,5,4) )
-                        ORDER BY t1.file_type ';
+                        FROM uploadlogin t1 INNER JOIN users t3 ON t1.uid = t3.id WHERE EXISTS
+                        (SELECT COUNT(*)  FROM uploadlogin t2
+                        WHERE  t2.file_type = t1.file_type AND t2.addtime > t1.addtime HAVING t1.status = 1 AND COUNT(*) < IF(file_type=2,5,4) )
+                        ORDER BY t1.file_type';
                 $data3 = DB::select($sql3);
                 $typelist = DB::select('SELECT id,name FROM slicetype');
                 $data = [];
@@ -124,6 +157,22 @@ class IndexController extends Controller
                     $file_type = $request->file_type;
                     $nowtime = date('Y-m-d');
                     $lasttime = date("Y-m-d",strtotime("-1 day"));
+//                    $sql1 = 'SELECT
+//                        t1.sliceid,
+//                        t1.playnum,
+//                        t2.id,
+//                        t2.file_title,
+//                        t2.file_type,
+//                        t2.remark,
+//                        t2.filepath,
+//                        t2.thumpath,
+//                        t2.uid,
+//                        t2.username,
+//                        t2.status,
+//                        t1.addtime
+//                        FROM playcollect t1
+//                        INNER JOIN uploadlogin t2 ON t1.sliceid = t2.id
+//                         WHERE status = 1 AND file_type = ? AND t1.addtime > ? AND t1.addtime < ? ORDER BY t1.playnum DESC LIMIT 0,4';
                     $sql1 = 'SELECT
                         t1.sliceid,
                         t1.playnum,
@@ -135,27 +184,44 @@ class IndexController extends Controller
                         t2.thumpath,
                         t2.uid,
                         t2.username,
+						t3.head_portrait,
                         t2.status,
                         t1.addtime
-                        FROM playcollect t1
-                        INNER JOIN uploadlogin t2 ON t1.sliceid = t2.id
-                         WHERE status = 1 AND file_type = ? AND t1.addtime > ? AND t1.addtime < ? ORDER BY t1.playnum DESC LIMIT 0,4';
+                        FROM ( uploadlogin t2 INNER JOIN users t3 ON t2.uid = t3.id)
+                        INNER JOIN playcollect t1 ON t1.sliceid = t2.id
+                         WHERE t2.status = 1 AND t2.file_type = ? AND t1.addtime > ? AND t1.addtime < ?  ORDER BY t1.playnum DESC LIMIT 0,4';
                     //$sqlTmp = sprintf($sql,$lasttime,$nowtime);
                     $data1 = DB::select($sql1,[$file_type,$lasttime,$nowtime]);
+//                    $sql2 = 'SELECT
+//                        id as sliceid,
+//                        pvnum as playnum,
+//                        id,
+//                        file_title,
+//                        file_type,
+//                        remark,
+//                        filepath,
+//                        thumpath,
+//                        uid,
+//                        username,
+//                        status,
+//                        addtime
+//                         FROM uploadlogin WHERE status = 1 AND file_type = %s ORDER BY addtime DESC';
                     $sql2 = 'SELECT
-                        id as sliceid,
-                        pvnum as playnum,
-                        id,
-                        file_title,
-                        file_type,
-                        remark,
-                        filepath,
-                        thumpath,
-                        uid,
-                        username,
-                        status,
-                        addtime
-                         FROM uploadlogin WHERE status = 1 AND file_type = %s ORDER BY addtime DESC';
+                        t2.id as sliceid,
+                        t2.pvnum as playnum,
+                        t2.id,
+                        t2.file_title,
+                        t2.file_type,
+                        t2.remark,
+                        t2.filepath,
+                        t2.thumpath,
+                        t2.uid,
+                        t2.username,
+						t3.head_portrait,
+                        t2.status,
+                        t2.addtime
+                         FROM uploadlogin t2 INNER JOIN users t3 ON t3.id = t2.uid WHERE t2.status = 1 AND t2.file_type = %s ORDER BY addtime DESC';
+
                     $sql2Tmp = sprintf($sql2,$file_type);
                     $data2 = DB::table(DB::raw("($sql2Tmp) as t"))->paginate(20);
                     $data = [];
@@ -213,6 +279,22 @@ class IndexController extends Controller
         $user = \Auth::user();
         if($user){
             $uid = $user->id;
+//            $sql = 'SELECT
+//                        t1.sliceid,
+//                        t1.userid,
+//                        t2.id,
+//                        t2.file_title,
+//                        t2.file_type,
+//                        t2.remark,
+//                        t2.filepath,
+//                        t2.thumpath,
+//                        t2.uid,
+//                        t2.username,
+//                        t2.status,
+//                        t1.addtime
+//                        FROM collect t1
+//                        INNER JOIN uploadlogin t2 ON t1.sliceid = t2.id
+//                         WHERE userid = %s ORDER BY t1.addtime DESC';
             $sql = 'SELECT
                         t1.sliceid,
                         t1.userid,
@@ -224,13 +306,14 @@ class IndexController extends Controller
                         t2.thumpath,
                         t2.uid,
                         t2.username,
+						t3.head_portrait,
                         t2.status,
                         t1.addtime
-                        FROM collect t1
-                        INNER JOIN uploadlogin t2 ON t1.sliceid = t2.id
+                        FROM (uploadlogin t2 INNER JOIN users t3 ON t2.uid = t3.id)
+                        INNER JOIN collect t1 ON t1.sliceid = t2.id
                          WHERE userid = %s ORDER BY t1.addtime DESC';
             $sqlTmp = sprintf($sql,$uid);
-            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(10);
+            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(15);
             $shenhenum = Uploadlogin::where('uid',$uid)->where('status',2)->count(); //待审核
             $data = [];
             $data['list'] = $list;
@@ -276,6 +359,22 @@ class IndexController extends Controller
         $user = \Auth::user();
         if($user){
             $uid = $user->id;
+//            $sql = 'SELECT
+//                        t1.sliceid,
+//                        t1.userid,
+//                        t2.id,
+//                        t2.file_title,
+//                        t2.file_type,
+//                        t2.remark,
+//                        t2.filepath,
+//                        t2.thumpath,
+//                        t2.uid,
+//                        t2.username,
+//                        t2.status,
+//                        t1.addtime
+//                        FROM playhistory t1
+//                        INNER JOIN uploadlogin t2 ON t1.sliceid = t2.id
+//                         WHERE userid = %s ORDER BY t1.addtime DESC';
             $sql = 'SELECT
                         t1.sliceid,
                         t1.userid,
@@ -287,13 +386,14 @@ class IndexController extends Controller
                         t2.thumpath,
                         t2.uid,
                         t2.username,
+						t3.head_portrait,
                         t2.status,
                         t1.addtime
-                        FROM playhistory t1
-                        INNER JOIN uploadlogin t2 ON t1.sliceid = t2.id
-                         WHERE userid = %s ORDER BY t1.addtime DESC';
+                        FROM ( uploadlogin t2 INNER JOIN users t3 ON t2.uid = t3.id)
+                        INNER JOIN playhistory t1 ON t1.sliceid = t2.id
+                         WHERE userid = 1 ORDER BY t1.addtime DESC';
             $sqlTmp = sprintf($sql,$uid);
-            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(10);
+            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(15);
             $shenhenum = Uploadlogin::where('uid',$uid)->where('status',2)->count(); //待审核
             $data = [];
             $data['list'] = $list;
@@ -313,20 +413,35 @@ class IndexController extends Controller
             if($search){
                 $where.=' and file_title like "%' . $search . '%"';
             }
-            $sql = "SELECT
-                        id as sliceid,
-                        pvnum as playnum,
-                        id,
-                        file_title,
-                        file_type,
-                        remark,
-                        filepath,
-                        thumpath,
-                        uid,
-                        username,
-                        status,
-                        addtime
-                         FROM uploadlogin WHERE %s ORDER BY addtime DESC" ;
+//            $sql = "SELECT
+//                        id as sliceid,
+//                        pvnum as playnum,
+//                        id,
+//                        file_title,
+//                        file_type,
+//                        remark,
+//                        filepath,
+//                        thumpath,
+//                        uid,
+//                        username,
+//                        status,
+//                        addtime
+//                         FROM uploadlogin WHERE %s ORDER BY addtime DESC" ;
+            $sql = 'SELECT
+                        t2.id as sliceid,
+                        t2.pvnum as playnum,
+                        t2.id,
+                        t2.file_title,
+                        t2.file_type,
+                        t2.remark,
+                        t2.filepath,
+                        t2.thumpath,
+                        t2.uid,
+                        t2.username,
+						t3.head_portrait,
+                        t2.status,
+                        t2.addtime
+                         FROM uploadlogin t2 INNER JOIN users t3 ON t3.id = t2.uid WHERE %s ORDER BY addtime DESC';
             $sqlTmp = sprintf($sql,$where);
             $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(12);
             $data = [];
