@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Models\Collect;
+use App\Models\Uploadlogin;
 use App\Models\Users;
 use App\Service\ImageUploadhandler;
 use Illuminate\Http\Request;
@@ -58,6 +60,13 @@ class UserController extends Controller
             $data['username'] = $user->username;
             $data['name'] = $user->name;
             $data['head_portrait'] = $user->head_portrait;
+            $data['mobile'] = $user->mobile;
+            //视频上传数
+            $data['upnum'] = Uploadlogin::where('uid',$user->id)->count();
+            $data['collcetnum'] = Collect::where('userid',$user->id)->count();
+            $data['daishenhenum'] = Uploadlogin::where('status',2)->where('uid',$user->id)->count();
+            //视频收藏数
+            //视频待审核数
             return json_encode(['errcode'=>1,'errmsg'=>'ok','data'=>$data],JSON_UNESCAPED_UNICODE);
         }else{
            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
