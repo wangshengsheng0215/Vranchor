@@ -43,6 +43,7 @@ Route::group(['prefix'=>'admin','middleware'=>'check.login'],function (){
     Route::post('vranchor/deleteslice','Admin\VideoController@deleteslice');//删除视频
     Route::post('vranchor/batchupdatestatus','Admin\VideoController@batchupdatestatus');//批量修改状态
     Route::post('vranchor/batchdeleteslice','Admin\VideoController@batchdeleteslice');//批量删除视频
+    Route::post('vranchor/updateuserinfo','Admin\UserController@updateuserinfo'); //修改用户信息
 
 });
 
