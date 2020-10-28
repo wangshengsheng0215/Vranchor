@@ -11,12 +11,13 @@
 |
 */
 
-//Route::get('/', function () {return view('welcome');}); //欢迎页面
+Route::get('/', function () {return view('welcome');}); //欢迎页面
 Route::post('web/vranchor/register','Web\LoginController@register');
 //Route::get('/', function () {return view('homepage');}); //首页
 //Route::get('test','Web\TestController@test');//测试
 //Route::post('sliceUpload','Web\TestController@sliceUpload');//上传
 Route::get('sliceDownload','Web\TestController@sliceDownload');//下载
+Route::get('api/vranchor/sliceDownload','Api\VideoController@sliceDownload');//视频下载
 //Route::get('list','Web\TestController@list');
 Route::group(['prefix'=>'web','middleware'=>'check.login'],function (){
     Route::get('vranchor/index','Web\IndexController@index');  //首页
