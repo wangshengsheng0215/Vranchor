@@ -408,7 +408,7 @@ class IndexController extends Controller
     public function search(Request $request){
         $user = \Auth::user();
         if($user){
-            $where = ' status = 1 ';
+            $where = ' t2.status = 1 ';
             $search = $request->input('search');
             if($search){
                 $where.=' and file_title like "%' . $search . '%"';
@@ -452,6 +452,7 @@ class IndexController extends Controller
         }
     }
 
+    //视频类型
     public function filetype(Request $request){
         $typelist = DB::select('SELECT id,name FROM slicetype');;
         $filetype = [];
