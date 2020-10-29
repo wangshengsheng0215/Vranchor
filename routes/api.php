@@ -35,3 +35,9 @@ Route::group(['prefix'=>'vranchor','middleware'=>'check.login'],function (){
     Route::post('fileuploads','Api\VideoController@fileuploads'); //文件上传
 
 });
+
+Route::group(['prefix'=>'webapp',],function (){
+    Route::get('index','Api\IndexController@index');
+    Route::post('moreslice','Api\IndexController@moreslice');
+
+});
