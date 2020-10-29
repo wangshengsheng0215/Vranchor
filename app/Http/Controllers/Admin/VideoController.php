@@ -128,8 +128,12 @@ class VideoController extends Controller
 
                     $this->validate($request, $rules, $messages);
                     $sliceid = $request->input('sliceid');
-                    Uploadlogin::where('id',$sliceid)->delete();
-                    return json_encode(['errcode'=>'1','errmsg'=>'删除成功'],JSON_UNESCAPED_UNICODE );
+                    if (Uploadlogin::where('id',$sliceid)->delete()){
+                        return json_encode(['errcode'=>'1','errmsg'=>'删除成功'],JSON_UNESCAPED_UNICODE );
+                    }else{
+                        return json_encode(['errcode'=>'1002','errmsg'=>'删除失败'],JSON_UNESCAPED_UNICODE );
+                    }
+
 
                 }catch (ValidationException $validationException){
                     $messages = $validationException->validator->getMessageBag()->first();
@@ -159,8 +163,12 @@ class VideoController extends Controller
 
                     $this->validate($request, $rules, $messages);
                     $arrsliceid = $request->input('sliceid');
-                    Uploadlogin::whereIn('id',$arrsliceid)->delete();
-                    return json_encode(['errcode'=>'1','errmsg'=>'删除成功'],JSON_UNESCAPED_UNICODE );
+                    if (Uploadlogin::whereIn('id',$arrsliceid)->delete()){
+                        return json_encode(['errcode'=>'1','errmsg'=>'删除成功'],JSON_UNESCAPED_UNICODE );
+                    }else{
+                        return json_encode(['errcode'=>'1002','errmsg'=>'删除失败'],JSON_UNESCAPED_UNICODE );
+                    }
+
 
                 }catch (ValidationException $validationException){
                     $messages = $validationException->validator->getMessageBag()->first();
