@@ -39,5 +39,5 @@ Route::group(['prefix'=>'vranchor','middleware'=>'check.login'],function (){
 Route::group(['prefix'=>'webapp',],function (){
     Route::get('index','Api\IndexController@index');
     Route::post('moreslice','Api\IndexController@moreslice');
-
+    Route::post('slicerecommend','Api\IndexController@slicerecommend');//视频推荐
 });

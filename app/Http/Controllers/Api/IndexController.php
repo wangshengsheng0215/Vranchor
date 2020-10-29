@@ -106,4 +106,48 @@ class IndexController extends Controller
 
     }
 
+    //移动端相关推荐
+    //相关推荐
+    public function slicerecommend(Request $request){
+
+            //规则
+            try {
+                $rules = [
+                    'file_type'=>'required',
+                ];
+                //自定义消息
+                $messages = [
+                    'file_type.required' => '视频分类值不能为空',
+                ];
+
+                $this->validate($request, $rules, $messages);
+
+                $file_type = $request->file_type;
+                $sql2 = 'SELECT
+                        t2.id as sliceid,
+                        t2.pvnum as playnum,
+                        t2.id,
+                        t2.file_title,
+                        t2.file_type,
+                        t2.remark,
+                        t2.filepath,
+                        t2.thumpath,
+                        t2.uid,
+                        t2.username,
+						t3.head_portrait,
+                        t2.status,
+                        t2.addtime
+                         FROM uploadlogin t2 INNER JOIN users t3 ON t3.id = t2.uid WHERE t2.status = 1 AND t2.file_type = ? ORDER BY addtime DESC limit 0,6';
+                $data2 = DB::select($sql2,[$file_type]);
+                $data = [];
+                $data['slicerecommend'] = $data2;
+
+                return  json_encode(['errcode'=>'1','errmsg'=>'ok','data'=>$data],JSON_UNESCAPED_UNICODE);
+            }catch (ValidationException $validationException){
+                $messages = $validationException->validator->getMessageBag()->first();
+                return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
+            }
+
+    }
+
 }
