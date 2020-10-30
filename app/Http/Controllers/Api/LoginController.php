@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Loginhistory;
 use App\Models\Users;
+use App\Service\Sms\Sms;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +24,7 @@ class LoginController extends Controller
                 'username'=>'required|unique:users,username',
                 'password'=>'required',
                 'mobile'=>'required|unique:users,mobile|regex:/^1[345789][0-9]{9}$/',
+                'code'=>'required',
 
             ];
             //自定义消息
@@ -32,7 +34,8 @@ class LoginController extends Controller
                 'username.unique' => '用户名已存在',
                 'mobile.required' => '请输入手机号',
                 'mobile.unique' => '手机号已被使用',
-                'mobile.regex' => '手机号不合法'
+                'mobile.regex' => '手机号不合法',
+                'code'=> '验证码不为空'
             ];
 
             $this->validate($request, $rules, $messages);
@@ -40,7 +43,11 @@ class LoginController extends Controller
             $username = $request->input('username');
             $password = $request->input('password');
             $mobile = $request->input('mobile');
-
+            $code = $request->input('code');
+            $checkcode = Sms::checkCode($mobile,$code);
+            if(is_array($checkcode)){
+                return json_encode($checkcode,JSON_UNESCAPED_UNICODE);
+            }
             $user = new Users();
             $user->username = $username;
             $user->password =  Hash::make($password);
