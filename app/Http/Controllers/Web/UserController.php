@@ -73,6 +73,46 @@ class UserController extends Controller
         }
     }
 
+    public function orderuserinfo(Request $request){
+        $user = \Auth::user();
+        if($user){
+            //规则
+            try {
+                $rules = [
+                    'uid'=>'required',
+                ];
+                //自定义消息
+                $messages = [
+                    'uid.required' => '用户id不能为空',
+                ];
+
+                $this->validate($request, $rules, $messages);
+                $uid = $request->uid;
+                $user1 = Users::where('id',$uid)->first();
+                $data = [];
+                $data['id'] = $user1->id;
+                $data['username'] = $user1->username;
+                $data['name'] = $user1->name;
+                $data['head_portrait'] = $user1->head_portrait;
+                $data['mobile'] = $user1->mobile;
+                //视频上传数
+                $data['upnum'] = Uploadlogin::where('uid',$user1->id)->count();
+                $data['collcetnum'] = Collect::where('userid',$user1->id)->count();
+                $data['daishenhenum'] = Uploadlogin::where('status',2)->where('uid',$user1->id)->count();
+                //视频收藏数
+                //视频待审核数
+                return json_encode(['errcode'=>1,'errmsg'=>'ok','data'=>$data],JSON_UNESCAPED_UNICODE);
+
+            }catch (ValidationException $validationException){
+                $messages = $validationException->validator->getMessageBag()->first();
+                return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
+            }
+
+        }else{
+            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+        }
+    }
+
     //修改用户信息
     public function updateinfo(Request $request ,ImageUploadhandler $uploadhandler){
         $user = \Auth::user();

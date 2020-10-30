@@ -10,13 +10,13 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/', function () {return view('welcome');}); //欢迎页面
+Route::get('slice/test','Web\TestController@slicetest');
+//Route::get('/', function () {return view('welcome');}); //欢迎页面
 Route::post('web/vranchor/register','Web\LoginController@register');
 //Route::get('/', function () {return view('homepage');}); //首页
-//Route::get('test','Web\TestController@test');//测试
-//Route::post('sliceUpload','Web\TestController@sliceUpload');//上传
-Route::get('sliceDownload','Web\TestController@sliceDownload');//下载
+Route::get('test','Web\TestController@test');//测试
+Route::post('sliceUpload','Web\TestController@sliceUpload');//上传
+//Route::get('sliceDownload','Web\TestController@sliceDownload');//下载
 Route::get('api/vranchor/sliceDownload','Api\VideoController@sliceDownload');//视频下载
 //Route::get('list','Web\TestController@list');
 Route::group(['prefix'=>'web','middleware'=>'check.login'],function (){
@@ -32,6 +32,7 @@ Route::group(['prefix'=>'web','middleware'=>'check.login'],function (){
     Route::post('vranchor/search','Web\IndexController@search');//搜索
     Route::post('vranchor/cancelcollect','Web\IndexController@cancelcollect'); //取消收藏
     Route::get('vranchor/filetype','Web\IndexController@filetype'); //视频类型
+    Route::get('vranchor/orderuserinfo','Web\UserController@orderuserinfo'); //用户信息
 });
 
 Route::group(['prefix'=>'admin','middleware'=>'check.login'],function (){
