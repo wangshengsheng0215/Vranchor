@@ -36,10 +36,13 @@ class UserController extends Controller
         try {
             //规则
             $rules = [
+                'username'=>'required',
                 'mobile'=>'required|regex:/^1[345789][0-9]{9}$/',
+
             ];
             //自定义消息
             $messages = [
+                'username'=>'required',
                 'mobile.required' => '请输入手机号',
                 'mobile.regex' => '手机号不合法',
             ];
@@ -47,7 +50,8 @@ class UserController extends Controller
             $this->validate($request, $rules, $messages);
             //获取用户和手机号
             $mobile = $request->input('mobile');
-            $user = Users::where('mobile',$mobile)->where('status',1)->first();
+            $username = $request->input('username');
+            $user = Users::where('username',$username)->where('status',1)->first();
             if(!isset($user->mobile)){
                 return json_encode(['errcode'=>'1002','errmsg'=>'用户手机号不存在'],JSON_UNESCAPED_UNICODE );
             }
@@ -55,7 +59,7 @@ class UserController extends Controller
                 return json_encode(['errcode'=>'1002','errmsg'=>'手机号不一致'],JSON_UNESCAPED_UNICODE );
             }
 
-            $smslog = (new Smslog())->sendMobileVerifyCode($user->mobile);
+            $smslog = (new Smslog())->sendMobileVerifyCode($user->mobile,1);
             return $smslog;
 
         }catch (ValidationException $validationException){

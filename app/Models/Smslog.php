@@ -13,8 +13,8 @@ class Smslog extends Model
     public $timestamps = 'flase';
     protected $fillable =['id','mobile','session_id','code','status','scene','addtime','error_msg'];
 
-    public function sendMobileVerifyCode($mobile){
-        $scene = $this->Scene(0);//场景0：验证码。1：短信通知。2：推广短信。3：国际/港澳台消息。
+    public function sendMobileVerifyCode($mobile,$n){
+        $scene = $this->Scene($n);//场景0：验证码。1：短信通知。2：推广短信。3：国际/港澳台消息。
         $smsTemplate=$this->getSmsTemplateByScene($scene);//去下边找这个方法！自己的数据库中存在着从阿里云申请的短信模板
         $session_id=md5(time().mt_rand(1,999999999));//没啥用的
         $code = rand(100000, 999999);

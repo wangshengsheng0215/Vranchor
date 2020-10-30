@@ -177,7 +177,7 @@ class LoginController extends Controller
             $this->validate($request, $rules, $messages);
             //获取用户和手机号
             $mobile = $request->input('mobile');
-            $smslog = (new Smslog())->sendMobileVerifyCode($mobile);
+            $smslog = (new Smslog())->sendMobileVerifyCode($mobile,0);
             return $smslog;
 
         }catch (ValidationException $validationException){
