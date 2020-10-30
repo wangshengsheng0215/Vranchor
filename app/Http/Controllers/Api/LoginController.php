@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Loginhistory;
+use App\Models\Smslog;
 use App\Models\Users;
 use App\Service\Sms\Sms;
 use Illuminate\Http\Request;
@@ -156,6 +157,33 @@ class LoginController extends Controller
             return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
         }
 
+
+    }
+
+    //发送验证码
+
+    public function sendregistercode(Request $request){
+        try {
+            //规则
+            $rules = [
+                'mobile'=>'required|regex:/^1[345789][0-9]{9}$/',
+            ];
+            //自定义消息
+            $messages = [
+                'mobile.required' => '请输入手机号',
+                'mobile.regex' => '手机号不合法',
+            ];
+
+            $this->validate($request, $rules, $messages);
+            //获取用户和手机号
+            $mobile = $request->input('mobile');
+            $smslog = (new Smslog())->sendMobileVerifyCode($mobile);
+            return $smslog;
+
+        }catch (ValidationException $validationException){
+            $messages = $validationException->validator->getMessageBag()->first();
+            return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
+        }
 
     }
 

@@ -21,6 +21,7 @@ Route::post('vranchor/register','Api\LoginController@register');
 Route::post('vranchor/login','Api\LoginController@login');
 
 Route::post('vranchor/sendcode','Api\UserController@sendcode');
+Route::post('vranchor/sendregistercode','Api\LoginController@sendregistercode');
 Route::post('vranchor/findPassword','Api\UserController@findPassword');
 
 Route::group(['prefix'=>'vranchor','middleware'=>'check.login'],function (){
