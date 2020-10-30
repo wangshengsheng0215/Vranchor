@@ -15,13 +15,13 @@ class IndexController extends Controller
     //首页
     public function index(Request $request){
 
-        $user = \Auth::user();
-       // dd($user);
-        if($user) {
-            $role = $user->role;
-            if ($role == 1) {
-                //管理员权限
-            } elseif ($role == 2) {
+//        $user = \Auth::user();
+//       // dd($user);
+//        if($user) {
+//            $role = $user->role;
+//            if ($role == 1) {
+//                //管理员权限
+//            } elseif ($role == 2) {
 
                 //普通用户权限
                 //昨日播放量最多的视频前10条
@@ -123,10 +123,10 @@ class IndexController extends Controller
                 $data['typeslice'] = $data3;
                 return json_encode(['errcode' => '1', 'errmsg' => 'ok', 'data' => $data], JSON_UNESCAPED_UNICODE);
 
-            } else {
-                return json_encode(['errcode' => '401', 'errmsg' => '该权限不存在'], JSON_UNESCAPED_UNICODE);
-            }
-        }
+//            } else {
+//                return json_encode(['errcode' => '401', 'errmsg' => '该权限不存在'], JSON_UNESCAPED_UNICODE);
+//            }
+       // }
 //        }else{
 //            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
 //        }
@@ -134,12 +134,12 @@ class IndexController extends Controller
 
     //更多视频
     public function moreslice(Request $request){
-        $user = \Auth::user();
-        if($user){
-            $role = $user->role;
-            if($role == 1){
-                //管理员权限
-            }elseif ($role == 2){
+//        $user = \Auth::user();
+//        if($user){
+//            $role = $user->role;
+//            if($role == 1){
+//                //管理员权限
+//            }elseif ($role == 2){
                 //普通用户权限
 
                 //规则
@@ -235,10 +235,10 @@ class IndexController extends Controller
                 }
 
 
-            }
-        }else{
-            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
-        }
+          //  }
+//        }else{
+//            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+//        }
 
     }
 
@@ -406,8 +406,8 @@ class IndexController extends Controller
 
     //全局搜索
     public function search(Request $request){
-        $user = \Auth::user();
-        if($user){
+//        $user = \Auth::user();
+//        if($user){
             $where = ' t2.status = 1 ';
             $search = $request->input('search');
             if($search){
@@ -447,9 +447,9 @@ class IndexController extends Controller
             $data = [];
             $data['list'] = $list;
             return  json_encode(['errcode'=>'1','errmsg'=>'ok','data'=>$data],JSON_UNESCAPED_UNICODE);
-        }else{
-            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
-        }
+//        }else{
+//            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+//        }
     }
 
     //视频类型

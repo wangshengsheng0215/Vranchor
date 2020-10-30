@@ -20,6 +20,7 @@ use Illuminate\Validation\ValidationException;
 class VideoController extends Controller
 {
 
+
     //视频上传
     public function sliceUpload(Request $request)
     {
@@ -250,8 +251,8 @@ class VideoController extends Controller
 
     //视频播放
     public function sliceplay(Request $request){
-        $user = \Auth::user();
-        if ($user){
+//        $user = \Auth::user();
+//        if ($user){
             try {
                 //规则
                 $rules = [
@@ -310,9 +311,9 @@ class VideoController extends Controller
                 return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
             }
 
-        }else{
-            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
-        }
+//        }else{
+//            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+//        }
     }
 
 
@@ -384,8 +385,8 @@ class VideoController extends Controller
 
     //视频信息
     public function sliceinfo(Request $request){
-        $user = \Auth::user();
-        if ($user){
+//        $user = \Auth::user();
+//        if ($user){
             try {
                 //规则
                 $rules = [
@@ -442,9 +443,9 @@ class VideoController extends Controller
                 return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
             }
 
-        }else{
-            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
-        }
+//        }else{
+//            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+//        }
     }
 
     //相关推荐
