@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Models\Collect;
+use App\Models\Playcollect;
 use App\Models\Uploadlogin;
 use App\Models\Users;
 use App\Service\ImageUploadhandler;
@@ -99,6 +100,8 @@ class UserController extends Controller
                 $data['upnum'] = Uploadlogin::where('uid',$user1->id)->count();
                 $data['collcetnum'] = Collect::where('userid',$user1->id)->count();
                 $data['daishenhenum'] = Uploadlogin::where('status',2)->where('uid',$user1->id)->count();
+                $uidarr = Uploadlogin::where('uid',$user1->id)->pluck('id');
+                $data['playnum'] = Playcollect::whereIn('sliceid',$uidarr)->sum('playnum');
                 //视频收藏数
                 //视频待审核数
                 return json_encode(['errcode'=>1,'errmsg'=>'ok','data'=>$data],JSON_UNESCAPED_UNICODE);
