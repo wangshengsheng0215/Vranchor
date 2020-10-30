@@ -36,7 +36,7 @@ class LoginController extends Controller
                 'mobile.required' => '请输入手机号',
                 'mobile.unique' => '手机号已被使用',
                 'mobile.regex' => '手机号不合法',
-                'code'=> '验证码不为空'
+                'code.required'=> '验证码不为空'
             ];
 
             $this->validate($request, $rules, $messages);

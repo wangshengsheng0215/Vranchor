@@ -42,7 +42,7 @@ class UserController extends Controller
             ];
             //自定义消息
             $messages = [
-                'username'=>'required',
+                'username'=>'请输入用户名',
                 'mobile.required' => '请输入手机号',
                 'mobile.regex' => '手机号不合法',
             ];
@@ -83,6 +83,7 @@ class UserController extends Controller
             ];
             //自定义消息
             $messages = [
+                'username.required'=>'请输入账号',
                 'mobile.required' => '请输入手机号',
                 'code.required' => '验证码不为空',
                 'newPassword.required' => '请输入新密码',
