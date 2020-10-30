@@ -32,7 +32,7 @@ Route::group(['prefix'=>'web','middleware'=>'check.login'],function (){
     Route::post('vranchor/search','Web\IndexController@search');//搜索
     Route::post('vranchor/cancelcollect','Web\IndexController@cancelcollect'); //取消收藏
     Route::get('vranchor/filetype','Web\IndexController@filetype'); //视频类型
-    Route::get('vranchor/orderuserinfo','Web\UserController@orderuserinfo'); //用户信息
+    Route::post('vranchor/orderuserinfo','Web\UserController@orderuserinfo'); //用户信息
 });
 
 Route::group(['prefix'=>'admin','middleware'=>'check.login'],function (){
