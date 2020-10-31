@@ -445,6 +445,8 @@ class VideoController extends Controller
                 $info = DB::select($sql,[$sliceid]);
                 if ($user){
                     $collcet = Collect::where('sliceid',$sliceid)->where('userid',$user->id)->first();
+                }else{
+                    $collcet = [];
                 }
                 $data = [];
                 $data['list'] = $info;
