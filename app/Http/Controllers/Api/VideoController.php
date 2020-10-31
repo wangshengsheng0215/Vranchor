@@ -251,7 +251,7 @@ class VideoController extends Controller
 
     //视频播放
     public function sliceplay(Request $request){
-//        $user = \Auth::user();
+        $user = \Auth::user();
 //        if ($user){
             try {
                 //规则
@@ -264,17 +264,32 @@ class VideoController extends Controller
                 ];
                 $this->validate($request, $rules, $messages);
                 $sliceid = $request->input('sliceid');
-                if(Playhistory::where('sliceid',$sliceid)->where('userid',$user->id)->first()){
-                    $a = Playhistory::where('sliceid',$sliceid)->where('userid',$user->id)->update(['addtime'=>date('Y-m-d H:i:s')]);
+                if($user){
+                    if(Playhistory::where('sliceid',$sliceid)->where('userid',$user->id)->first()){
+                        $a = Playhistory::where('sliceid',$sliceid)->where('userid',$user->id)->update(['addtime'=>date('Y-m-d H:i:s')]);
+                    }else{
+                        $history = new Playhistory();
+                        $history->sliceid = $sliceid;
+                        $history->userid = $user->id;
+                        $history->year = date('Y');
+                        $history->month = date('m');
+                        $history->day = date('d');
+                        $a = $history->save();
+                    }
                 }else{
-                    $history = new Playhistory();
-                    $history->sliceid = $sliceid;
-                    $history->userid = $user->id;
-                    $history->year = date('Y');
-                    $history->month = date('m');
-                    $history->day = date('d');
-                    $a = $history->save();
+                    if(Playhistory::where('sliceid',$sliceid)->first()){
+                        $a = Playhistory::where('sliceid',$sliceid)->update(['addtime'=>date('Y-m-d H:i:s')]);
+                    }else{
+                        $history = new Playhistory();
+                        $history->sliceid = $sliceid;
+                        $history->userid = $user->id;
+                        $history->year = date('Y');
+                        $history->month = date('m');
+                        $history->day = date('d');
+                        $a = $history->save();
+                    }
                 }
+
 
                 if ($a){
                     $playcollect = new Playcollect();
@@ -385,7 +400,7 @@ class VideoController extends Controller
 
     //视频信息
     public function sliceinfo(Request $request){
-//        $user = \Auth::user();
+        $user = \Auth::user();
 //        if ($user){
             try {
                 //规则
@@ -428,8 +443,9 @@ class VideoController extends Controller
                         t2.addtime
                          FROM uploadlogin t2  INNER JOIN users t3 ON t3.id = t2.uid  WHERE t2.id = ?';
                 $info = DB::select($sql,[$sliceid]);
-
-                $collcet = Collect::where('sliceid',$sliceid)->where('userid',$user->id)->first();
+                if ($user){
+                    $collcet = Collect::where('sliceid',$sliceid)->where('userid',$user->id)->first();
+                }
                 $data = [];
                 $data['list'] = $info;
                 if($collcet){
