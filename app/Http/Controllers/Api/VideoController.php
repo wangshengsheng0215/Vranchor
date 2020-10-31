@@ -468,8 +468,8 @@ class VideoController extends Controller
 
     //相关推荐
     public function slicerecommend(Request $request){
-        $user = \Auth::user();
-        if($user){
+//        $user = \Auth::user();
+//        if($user){
                 //规则
                 try {
                     $rules = [
@@ -507,9 +507,9 @@ class VideoController extends Controller
                     return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
                 }
 
-        }else{
-            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
-        }
+//        }else{
+//            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+//        }
     }
 
     //取消收藏
