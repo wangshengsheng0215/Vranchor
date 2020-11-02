@@ -45,40 +45,45 @@ class IndexController extends Controller
               $lauditnum = Uploadlogin::where('status',1)->where('addtime','>',$ltime)->where('addtime','<',$nowtime)->count();
 
               $ud = [];
+              //播放量
               if($dayplaynum >= $ldayplaynum){
-                  $ud['dayplaystatus'] = 1;
-                  $ud['dayplayud'] = $dayplaynum-$ldayplaynum;
+                  $ud[0]['status'] = 1;
+                  $ud[0]['ud'] = $dayplaynum-$ldayplaynum;
               }else{
-                  $ud['dayplaystatus'] = 2;
-                  $ud['dayplayud'] = $ldayplaynum-$dayplaynum;
+                  $ud[0]['status'] = 2;
+                  $ud[0]['ud'] = $ldayplaynum-$dayplaynum;
               }
+              //收藏量
               if($collectnum >= $lcollectnum){
-                  $ud['collectstatus'] = 1;
-                  $ud['collectud'] = $collectnum-$lcollectnum;
+                  $ud[1]['status'] = 1;
+                  $ud[1]['ud'] = $collectnum-$lcollectnum;
               }else{
-                  $ud['collectstatus'] = 2;
-                  $ud['collectud'] = $lcollectnum-$collectnum;
+                  $ud[1]['status'] = 2;
+                  $ud[1]['ud'] = $lcollectnum-$collectnum;
               }
+              //下载量
               if($downloadnum >= $ldownloadnum){
-                  $ud['downloadstatus'] = 1;
-                  $ud['domnloadud'] = $downloadnum-$ldownloadnum;
+                  $ud[2]['status'] = 1;
+                  $ud[2]['ud'] = $downloadnum-$ldownloadnum;
               }else{
-                  $ud['downloadstatus'] = 2;
-                  $ud['domnloadud'] = $ldownloadnum-$downloadnum;
+                  $ud[2]['status'] = 2;
+                  $ud[2]['ud'] = $ldownloadnum-$downloadnum;
               }
+              //视频上传
               if($uploadnum >= $luploadnum){
-                  $ud['uploadstatus'] = 1;
-                  $ud['uploadud'] = $uploadnum-$luploadnum;
+                  $ud[3]['status'] = 1;
+                  $ud[3]['ud'] = $uploadnum-$luploadnum;
               }else{
-                  $ud['uploadstatus'] = 2;
-                  $ud['uploadud'] = $luploadnum-$uploadnum;
+                  $ud[3]['status'] = 2;
+                  $ud[3]['ud'] = $luploadnum-$uploadnum;
               }
+              //待审核
               if($auditnum >= $lauditnum){
-                  $ud['auditstatus'] = 1;
-                  $ud['auditud'] = $auditnum-$lauditnum;
+                  $ud[4]['status'] = 1;
+                  $ud[4]['ud'] = $auditnum-$lauditnum;
               }else{
-                  $ud['auditstatus'] = 2;
-                  $ud['auditud'] = $lauditnum-$auditnum;
+                  $ud[4]['status'] = 2;
+                  $ud[4]['ud'] = $lauditnum-$auditnum;
               }
 
 
