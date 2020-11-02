@@ -251,7 +251,8 @@ class VideoController extends Controller
 
     //视频播放
     public function sliceplay(Request $request){
-        $user = \Auth::user();
+        //$user = \Auth::user();
+        $user = auth('api')->user();
 //        if ($user){
             try {
                 //规则
@@ -265,6 +266,7 @@ class VideoController extends Controller
                 $this->validate($request, $rules, $messages);
                 $sliceid = $request->input('sliceid');
                 if($user){
+
                     if(Playhistory::where('sliceid',$sliceid)->where('userid',$user->id)->first()){
                         $a = Playhistory::where('sliceid',$sliceid)->where('userid',$user->id)->update(['addtime'=>date('Y-m-d H:i:s')]);
                     }else{
