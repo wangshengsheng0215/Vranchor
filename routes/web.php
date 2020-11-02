@@ -22,6 +22,7 @@ Route::get('api/vranchor/sliceDownload','Api\VideoController@sliceDownload');//�
 Route::get('web/vranchor/index','Web\IndexController@index');  //首页
 Route::post('web/vranchor/moreslice','Web\IndexController@moreslice'); //更多视频
 Route::post('web/vranchor/search','Web\IndexController@search');//搜索
+Route::get('web/vranchor/filetype','Web\IndexController@filetype'); //视频类型
 Route::group(['prefix'=>'web','middleware'=>'check.login'],function (){
     //Route::get('vranchor/index','Web\IndexController@index');  //首页
     Route::get('vranchor/userlist','Web\UserController@userlist'); //用户列表
@@ -34,7 +35,7 @@ Route::group(['prefix'=>'web','middleware'=>'check.login'],function (){
     Route::post('vranchor/myhistory','Web\IndexController@myhistory'); //历史记录
     //Route::post('vranchor/search','Web\IndexController@search');//搜索
     Route::post('vranchor/cancelcollect','Web\IndexController@cancelcollect'); //取消收藏
-    Route::get('vranchor/filetype','Web\IndexController@filetype'); //视频类型
+    //Route::get('vranchor/filetype','Web\IndexController@filetype'); //视频类型
     Route::post('vranchor/orderuserinfo','Web\UserController@orderuserinfo'); //用户信息
 });
 
