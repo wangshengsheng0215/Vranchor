@@ -430,6 +430,7 @@ class VideoController extends Controller
                 $sql = 'SELECT
                         t2.id as sliceid,
                         t2.pvnum as playnum,
+                        t2.uvnum as uvnum,
                         t2.id,
                         t2.file_title,
                         t2.file_type,
@@ -443,6 +444,15 @@ class VideoController extends Controller
                         t2.addtime
                          FROM uploadlogin t2  INNER JOIN users t3 ON t3.id = t2.uid  WHERE t2.id = ?';
                 $info = DB::select($sql,[$sliceid]);
+                foreach ($info as $v){
+                    if($v->status == 2){
+                        $v->statuscn = '待审核';
+                    }elseif ($v->status == 1){
+                        $v->statuscn = '上架';
+                    }elseif ($v->status == 3){
+                        $v->statuscn = '下架';
+                    }
+                }
                 if ($user){
                     $collcet = Collect::where('sliceid',$sliceid)->where('userid',$user->id)->first();
                 }else{
