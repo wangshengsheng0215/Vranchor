@@ -120,6 +120,10 @@ class UserController extends Controller
             if($key != null){
                 $where.=' and t1.username like "%' . $key . '%"';
             }
+            $paginate = $request->input('paginate');
+            if(empty($paginate)){
+                $paginate = 10;
+            }
             $sql = 'SELECT t1.id,t1.username ,
                      t1.head_portrait,
                      t1.name,
@@ -138,7 +142,7 @@ class UserController extends Controller
                     ORDER BY t1.id';
             $sqlTmp = sprintf($sql,$where);
             //dd($sqlTmp);
-            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(10);
+            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate($paginate);
 
             return json_encode(['errcode'=>1,'errmsg'=>'ok','data'=>$list]);
         }else{

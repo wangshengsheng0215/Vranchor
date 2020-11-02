@@ -247,6 +247,10 @@ class IndexController extends Controller
         $user = \Auth::user();
         if($user){
             $uid = $user->id;
+            $paginate = $request->input('paginate');
+            if(empty($paginate)){
+                $paginate = 12;
+            }
             $sql = 'SELECT
                         id as sliceid,
                         pvnum as playnum,
@@ -262,7 +266,7 @@ class IndexController extends Controller
                         addtime
                          FROM uploadlogin WHERE  uid = %s ORDER BY addtime DESC';
             $sqlTmp = sprintf($sql,$uid);
-            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(12);
+            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate($paginate);
             $shenhenum = Uploadlogin::where('uid',$uid)->where('status',2)->count(); //待审核
             $data = [];
             $data['list'] = $list;
@@ -279,6 +283,10 @@ class IndexController extends Controller
         $user = \Auth::user();
         if($user){
             $uid = $user->id;
+            $paginate = $request->input('paginate');
+            if(empty($paginate)){
+                $paginate = 15;
+            }
 //            $sql = 'SELECT
 //                        t1.sliceid,
 //                        t1.userid,
@@ -313,7 +321,7 @@ class IndexController extends Controller
                         INNER JOIN collect t1 ON t1.sliceid = t2.id
                          WHERE userid = %s ORDER BY t1.addtime DESC';
             $sqlTmp = sprintf($sql,$uid);
-            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(15);
+            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate($paginate);
             $shenhenum = Uploadlogin::where('uid',$uid)->where('status',2)->count(); //待审核
             $data = [];
             $data['list'] = $list;
@@ -359,6 +367,10 @@ class IndexController extends Controller
         $user = \Auth::user();
         if($user){
             $uid = $user->id;
+            $paginate = $request->input('paginate');
+            if(empty($paginate)){
+                $paginate = 15;
+            }
 //            $sql = 'SELECT
 //                        t1.sliceid,
 //                        t1.userid,
@@ -393,7 +405,7 @@ class IndexController extends Controller
                         INNER JOIN playhistory t1 ON t1.sliceid = t2.id
                          WHERE userid = %s ORDER BY t1.addtime DESC';
             $sqlTmp = sprintf($sql,$uid);
-            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(15);
+            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate($paginate);
             $shenhenum = Uploadlogin::where('uid',$uid)->where('status',2)->count(); //待审核
             $data = [];
             $data['list'] = $list;
@@ -413,6 +425,10 @@ class IndexController extends Controller
             if($search){
                 $where.=' and file_title like "%' . $search . '%"';
             }
+        $paginate = $request->input('paginate');
+        if(empty($paginate)){
+            $paginate = 12;
+        }
 //            $sql = "SELECT
 //                        id as sliceid,
 //                        pvnum as playnum,
@@ -443,7 +459,7 @@ class IndexController extends Controller
                         t2.addtime
                          FROM uploadlogin t2 INNER JOIN users t3 ON t3.id = t2.uid WHERE %s ORDER BY addtime DESC';
             $sqlTmp = sprintf($sql,$where);
-            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate(12);
+            $list = DB::table(DB::raw("($sqlTmp) as t"))->paginate($paginate);
             $data = [];
             $data['list'] = $list;
             return  json_encode(['errcode'=>'1','errmsg'=>'ok','data'=>$data],JSON_UNESCAPED_UNICODE);

@@ -56,6 +56,10 @@ class IndexController extends Controller
                     $this->validate($request, $rules, $messages);
 
                     $file_type = $request->file_type;
+                    $paginate = $request->input('paginate');
+                    if(empty($paginate)){
+                        $paginate = 10;
+                    }
                     $nowtime = date('Y-m-d');
                     $lasttime = date("Y-m-d",strtotime("-1 day"));
                     $sql1 = 'SELECT
@@ -93,7 +97,7 @@ class IndexController extends Controller
                          FROM uploadlogin t2 INNER JOIN users t3 ON t3.id = t2.uid WHERE t2.status = 1 AND t2.file_type = %s ORDER BY addtime DESC';
 
                     $sql2Tmp = sprintf($sql2,$file_type);
-                    $data2 = DB::table(DB::raw("($sql2Tmp) as t"))->paginate(20);
+                    $data2 = DB::table(DB::raw("($sql2Tmp) as t"))->paginate($paginate);
                     $data = [];
                     $data['lastpaly'] = $data1;
                     $data['newslice'] = $data2;

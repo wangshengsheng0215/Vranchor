@@ -19,8 +19,11 @@ class VideoController extends Controller
             if($key != null){
                 $where.=' and file_title like "%' . $key . '%"';
             }
-
-            $list = Uploadlogin::whereRaw($where)->orderBy('addtime','desc')->paginate(10);
+            $paginate = $request->input('paginate');
+            if(empty($paginate)){
+                $paginate = 10;
+            }
+            $list = Uploadlogin::whereRaw($where)->orderBy('addtime','desc')->paginate($paginate);
             foreach ($list as $v){
                 if($v->status == 2){
                     $v->statuscn = '待审核';
