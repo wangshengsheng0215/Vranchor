@@ -77,13 +77,12 @@ class UserController extends Controller
                 //规则
                 $rules = [
                     'oldpassword'=>'required',
-                    'newpassword'=>'required|confirmed',
+                    'newpassword'=>'required',
                 ];
                 //自定义消息
                 $messages = [
                     'oldpassword.required' => '请输入旧密码',
                     'newpassword.required' => '请输入新密码',
-                    'newpassword.confirmed' => '两次输入新密码不一致',
                 ];
 
                 $this->validate($request, $rules, $messages);
