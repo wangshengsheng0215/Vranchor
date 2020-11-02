@@ -402,7 +402,8 @@ class VideoController extends Controller
 
     //视频信息
     public function sliceinfo(Request $request){
-        $user = \Auth::user();
+       // $user = \Auth::user();
+        $user = auth('api')->user();
 //        if ($user){
             try {
                 //规则
