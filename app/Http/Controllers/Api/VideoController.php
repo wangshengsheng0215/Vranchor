@@ -22,7 +22,7 @@ class VideoController extends Controller
 
 
     //视频上传
-    public function sliceUpload(Request $request)
+    public function sliceUpload1(Request $request)
     {
 
 
@@ -582,6 +582,253 @@ class VideoController extends Controller
 
     }
 
+
+
+    //视频单个上传
+    public function Videouploads(Request $request){
+            try {
+                //规则
+                $rules = [
+                    'file'=>'required',
+                    'blob_num'=>'required',
+                    'total_blob_num'=>'required',
+                    'file_name'=>'required',
+                ];
+                //自定义消息
+                $messages = [
+                    'file.required' => '视频文件不能为空',
+                    'blob_num.required' => '文件当前分片数不能为空',
+                    'total_blob_num.required' => '文件分片总数不能为空',
+                    'file_name.required' => '文件名不能为空',
+                ];
+                $this->validate($request, $rules, $messages);
+
+                $file = $request->file('file');
+                $blob_num = $request->get('blob_num');
+                $total_blob_num = $request->get('total_blob_num');
+                $file_name = $request->get('file_name');
+                $realPath = $file->getRealPath(); //临时文件的绝对路径
+
+                // 存储地址
+                $path = 'slice/'.date('Ymd');
+                $filename = $path .'/'. $file_name . '_' . $blob_num;
+
+                //上传
+                $upload = Storage::disk('local')->put($filename, file_get_contents($realPath));
+                if($blob_num == $total_blob_num){
+                    for($i=1; $i<= $total_blob_num; $i++){
+                        $blob = Storage::disk('local')->get($path.'/'. $file_name.'_'.$i);
+                        //Storage::disk('admin')->append($path.'/'.$file_name, $blob);   //不能用这个方法，函数会往已经存在的文件里添加0X0A，也就是\n换行符
+                        $this->file_force_contents(public_path('uploads').'/'.$path.'/'.$file_name,$blob,FILE_APPEND);
+
+
+                    }
+                    //合并完删除文件块
+                    for($i=1; $i<= $total_blob_num; $i++){
+                        Storage::disk('local')->delete($path.'/'. $file_name.'_'.$i);
+                    }
+
+                    //生成缩略图
+                    $ffmpeg = FFMpeg::create([
+                        'ffmpeg.binaries'  => 'D:/phpstudy_pro/Extensions/php/php7.3.4nts/ffmpeg-N-99404-g56ff01e6ec-win64-gpl-shared/bin/ffmpeg.exe',
+                        'ffprobe.binaries' => 'D:/phpstudy_pro/Extensions/php/php7.3.4nts/ffmpeg-N-99404-g56ff01e6ec-win64-gpl-shared/bin/ffprobe.exe',
+                        'timeout'          => 3600, // The timeout for the underlying process
+                        'ffmpeg.threads'   => 12,   // The number of threads that FFMpeg should use
+                    ]);
+                    $video = $ffmpeg->open(public_path('uploads').'/'.$path.'/'.$file_name);
+                    $dir = base_path('public/uploads/video/'.date('Ymd'));
+                    if( !is_dir( $dir ) ){
+                        mkdir( $dir, 0777, true );
+                    }
+
+                    $img_dir = base_path('public/uploads/video/'.date('Ymd').'/'.$file_name.'_res.jpg');
+                    $video->frame(TimeCode::fromSeconds(1))->save($img_dir);
+                }
+                if ($upload){
+                    $data=[];
+                    $data['videoname'] = $file_name;
+                    $data['videopath'] = 'uploads/'.$path.'/'.$file_name;
+                    $data['thumname'] = $file_name.'_res.jpg';
+                    $data['thumpath'] = 'uploads/video/'.date('Ymd').'/'.$file_name.'_res.jpg';
+
+                        return json_encode(['errcode'=>1,'errmsg'=>"上传成功",'data'=>$data],JSON_UNESCAPED_UNICODE);
+                }else{
+                    return json_encode(['errcode'=>0,'errmsg'=>"上传失败"],JSON_UNESCAPED_UNICODE);
+                }
+
+            }catch (ValidationException $validationException){
+                $messages = $validationException->validator->getMessageBag()->first();
+                return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
+            }
+    }
+
+
+    //音频单个上传
+    public function Audiouploads(Request $request){
+        try {
+            //规则
+            $rules = [
+                'file'=>'required',
+                'blob_num'=>'required',
+                'total_blob_num'=>'required',
+                'file_name'=>'required',
+            ];
+            //自定义消息
+            $messages = [
+                'file.required' => '视频文件不能为空',
+                'blob_num.required' => '文件当前分片数不能为空',
+                'total_blob_num.required' => '文件分片总数不能为空',
+                'file_name.required' => '文件名不能为空',
+            ];
+            $this->validate($request, $rules, $messages);
+
+            $file = $request->file('file');
+            $blob_num = $request->get('blob_num');
+            $total_blob_num = $request->get('total_blob_num');
+            $file_name = $request->get('file_name');
+            $realPath = $file->getRealPath(); //临时文件的绝对路径
+
+            // 存储地址
+            $path = 'slice/'.date('Ymd');
+            $filename = $path .'/'. $file_name . '_' . $blob_num;
+
+            //上传
+            $upload = Storage::disk('local')->put($filename, file_get_contents($realPath));
+            if($blob_num == $total_blob_num){
+                for($i=1; $i<= $total_blob_num; $i++){
+                    $blob = Storage::disk('local')->get($path.'/'. $file_name.'_'.$i);
+                    //Storage::disk('admin')->append($path.'/'.$file_name, $blob);   //不能用这个方法，函数会往已经存在的文件里添加0X0A，也就是\n换行符
+                    $this->file_force_contents(public_path('uploads').'/'.$path.'/'.$file_name,$blob,FILE_APPEND);
+
+
+                }
+                //合并完删除文件块
+                for($i=1; $i<= $total_blob_num; $i++){
+                    Storage::disk('local')->delete($path.'/'. $file_name.'_'.$i);
+                }
+
+                //生成缩略图
+//                    $ffmpeg = FFMpeg::create([
+//                        'ffmpeg.binaries'  => 'D:/phpstudy_pro/Extensions/php/php7.3.4nts/ffmpeg-N-99404-g56ff01e6ec-win64-gpl-shared/bin/ffmpeg.exe',
+//                        'ffprobe.binaries' => 'D:/phpstudy_pro/Extensions/php/php7.3.4nts/ffmpeg-N-99404-g56ff01e6ec-win64-gpl-shared/bin/ffprobe.exe',
+//                        'timeout'          => 3600, // The timeout for the underlying process
+//                        'ffmpeg.threads'   => 12,   // The number of threads that FFMpeg should use
+//                    ]);
+//                    $video = $ffmpeg->open(public_path('uploads').'/'.$path.'/'.$file_name);
+//                    $img_dir = base_path('public/uploads/video/'.$file_name.'_res.jpg');
+//                    $video->frame(TimeCode::fromSeconds(1))->save($img_dir);
+            }
+            if ($upload){
+                $data=[];
+                $data['audioname'] = $file_name;
+                $data['audiopath'] = 'uploads/'.$path.'/'.$file_name;
+
+                return json_encode(['errcode'=>1,'errmsg'=>"上传成功",'data'=>$data],JSON_UNESCAPED_UNICODE);
+            }else{
+                return json_encode(['errcode'=>0,'errmsg'=>"上传失败"],JSON_UNESCAPED_UNICODE);
+            }
+
+        }catch (ValidationException $validationException){
+            $messages = $validationException->validator->getMessageBag()->first();
+            return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
+        }
+    }
+
+
+    //视频上传
+    public function sliceUpload(Request $request)
+    {
+
+
+        $user = \Auth::user();
+        if($user){
+            try {
+                //规则
+                $rules = [
+                    'audioname'=>'required',
+                    'audiopath'=>'required',
+                    'videoname'=>'required',
+                    'videopath'=>'required',
+                    'thumname'=>'required',
+                    'thumpath'=>'required',
+                    'file_title'=>'required',
+                    'file_type'=>'required',
+                    'remark'=>'required',
+                ];
+                //自定义消息
+                $messages = [
+                    'audioname.required' => '音频文件名不能为空',
+                    'audiopath.required' => '音频文件路径不能为空',
+                    'videoname.required' => '视频文件名不能为空',
+                    'videopath.required' => '视频文件路径不能为空',
+                    'thumname.required' => '视频文件缩略图名不能为空',
+                    'thumpath.required' => '视频文件缩略图路径不能为空',
+                    'file_title.required' => '视频文件标题不能为空',
+                    'file_type.required' => '视频文件分类不能为空',
+                    'remark.required' => '视频描述不为空'
+                ];
+                $this->validate($request, $rules, $messages);
+
+               $audioname = $request->input('audioname');
+               $audiopath = $request->input('audiopath');
+               $videoname = $request->input('videoname');
+               $videopath = $request->input('videopath');
+               $thumname = $request->input('thumname');
+               $thumpath = $request->input('thumpath');
+                $remark = $request->get('remark');
+                $file_title = $request->get('file_title');
+                $file_type = $request->get('file_type');
+
+
+                    //生成缩略图
+                    $ffmpeg = FFMpeg::create([
+                        'ffmpeg.binaries'  => 'C:/phpstudy_pro/Extensions/php/php7.3.4nts/ffmpeg-N-99404-g56ff01e6ec-win64-gpl-shared/bin/ffmpeg.exe',
+                        'ffprobe.binaries' => 'C:/phpstudy_pro/Extensions/php/php7.3.4nts/ffmpeg-N-99404-g56ff01e6ec-win64-gpl-shared/bin/ffprobe.exe',
+                        'timeout'          => 3600, // The timeout for the underlying process
+                        'ffmpeg.threads'   => 12,   // The number of threads that FFMpeg should use
+                    ]);
+                $mp3 = public_path().'\\'.str_replace("/","\\",$audiopath);
+                $mp4 = public_path().'\\'.str_replace("/","\\",$videopath);
+                //$mp31 = public_path('uploads').'\slice\20201028\3452791424.mp3';
+               // $mp4 = public_path('uploads').'\slice\20200930\Main.avi';
+               // $newFile  =  public_path('uploads').'\slice\20201104\Main1.avi' ;
+               // $newFile1  =  public_path('uploads').'\slice\20201104\Main2.avi' ;
+
+                $newFile  =  public_path('uploads').'\slice\\'.date('Ymd').'\1_'.$videoname ;
+                $newFile1  =  public_path('uploads').'\slice\\'.date('Ymd').'\new_'.$videoname ;
+
+                $str = "ffmpeg -i ".$mp4." -c:v copy -an ".$newFile;
+                system($str);
+                $str1 = "ffmpeg -i ".$newFile." -i ".$mp3." -vcodec copy -acodec copy ".$newFile1;
+                system($str1);
+                    //$user = \Auth::user();
+                    $uploadlogin = new Uploadlogin();
+                    $uploadlogin->filename = 'new_'.$videoname;
+                    $uploadlogin->filepath = strstr($newFile1,'uploads');
+                    $uploadlogin->uid = $user->id;
+                    $uploadlogin->username = $user->username;
+                    $uploadlogin->thumname = $thumname;
+                    $uploadlogin->thumpath = $thumpath;
+                    $uploadlogin->status = 2;
+                    $uploadlogin->remark = $remark;
+                    $uploadlogin->pvnum = 0;
+                    $uploadlogin->uvnum = 0;
+                    $uploadlogin->file_title = $file_title;
+                    $uploadlogin->file_type = $file_type;
+                    if ($uploadlogin->save()){
+                        return json_encode(['errcode'=>1,'errmsg'=>"上传成功"],JSON_UNESCAPED_UNICODE);
+                    }
+                    return json_encode(['errcode'=>0,'errmsg'=>"保存记录失败"],JSON_UNESCAPED_UNICODE);
+
+            }catch (ValidationException $validationException){
+                $messages = $validationException->validator->getMessageBag()->first();
+                return json_encode(['errcode'=>'1001','errmsg'=>$messages],JSON_UNESCAPED_UNICODE );
+            }
+        }else{
+            return json_encode(['errcode'=>'402','errmsg'=>'token已过期请替换'],JSON_UNESCAPED_UNICODE );
+        }
+
+    }
 
 
 

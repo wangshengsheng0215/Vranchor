@@ -2,6 +2,6 @@
 
 function msg($code, $data, $msg )
 {
-    return compact('code', 'data', 'msg');
+    return compact('errcode', 'data', 'errmsg');
 }
 
