@@ -1,6 +1,6 @@
 <?php
 
-function msg($code, $data, $msg )
+function msg($errcode, $data, $errmsg )
 {
     return compact('errcode', 'data', 'errmsg');
 }
