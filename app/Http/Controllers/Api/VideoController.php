@@ -630,8 +630,8 @@ class VideoController extends Controller
 
                     //生成缩略图
                     $ffmpeg = FFMpeg::create([
-                        'ffmpeg.binaries'  => 'D:/phpstudy_pro/Extensions/php/php7.3.4nts/ffmpeg-N-99404-g56ff01e6ec-win64-gpl-shared/bin/ffmpeg.exe',
-                        'ffprobe.binaries' => 'D:/phpstudy_pro/Extensions/php/php7.3.4nts/ffmpeg-N-99404-g56ff01e6ec-win64-gpl-shared/bin/ffprobe.exe',
+                        'ffmpeg.binaries'  => 'C:/phpstudy_pro/Extensions/php/php7.3.4nts/ffmpeg-N-99404-g56ff01e6ec-win64-gpl-shared/bin/ffmpeg.exe',
+                        'ffprobe.binaries' => 'C:/phpstudy_pro/Extensions/php/php7.3.4nts/ffmpeg-N-99404-g56ff01e6ec-win64-gpl-shared/bin/ffprobe.exe',
                         'timeout'          => 3600, // The timeout for the underlying process
                         'ffmpeg.threads'   => 12,   // The number of threads that FFMpeg should use
                     ]);
